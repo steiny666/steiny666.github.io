@@ -1,110 +1,924 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meine Website</title>
+  <title>My Site</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    /* ---------- Base ---------- */
+    :root {
+      --content-max: 1600px; /* how wide the content gets on big screens */
+
+      /* Hero background. Replace with your own image, e.g.:
+         --hero-bg: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45)), url("images/hero.jpg");  */
+      --hero-bg: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory; /* each section snaps into place */
+    }
 
     body {
-      margin: 0;
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      color: #111;
-      background: #fff;
-    }
-
-    /* Hinweisleiste oben */
-    .topbar {
-      background: #111;
+      font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #15121f;
       color: #fff;
-      font-size: 0.8rem;
-      text-align: center;
-      padding: 0.4rem 1rem;
-      letter-spacing: 0.05em;
+      overflow-x: hidden;
     }
-    .topbar a { color: #fff; }
 
-    /* Hauptheader */
-    .header {
-      position: sticky;
-      top: 0;
-      background: #f4f4f4;
-      border-bottom: 1px solid #ddd;
+    p { line-height: 1.5; }
+
+    /* Glass effect for the header */
+    .glass {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    /* Hover growth shared by profile picture, artist pictures and cover tiles */
+    .grow {
+      transition: transform 0.3s ease;
+    }
+
+    .grow:hover { transform: scale(1.06); }
+
+    /* ---------- Header ---------- */
+    header {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(90%, 480px);
+      padding: 14px 28px;
+      border-radius: 999px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+    }
+
+    nav ul {
+      list-style: none;
       display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      opacity: 0.9;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    nav a:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+
+    /* ---------- Hero (home) ---------- */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 1rem 2rem;
-      z-index: 10;
+      justify-content: center;
+      gap: 14px;
+      padding: 0 24px;
+      text-align: center;
+      background-color: #764ba2;
+      background-image: var(--hero-bg);
+      background-size: cover;
+      background-position: center;
+      scroll-snap-align: start;
     }
 
-    .logo {
+    .hero h1 {
+      font-family: "IBM Plex Serif", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(2rem, 7vw, 5rem);
+      letter-spacing: 0.02em;
+      word-spacing: 0.15em;
+      line-height: 1.1;
+      max-width: 100%;
+      text-wrap: balance;
+      overflow-wrap: break-word;
+      animation: spawn 1.2s ease-out both;
+    }
+
+    @keyframes spawn {
+      from { opacity: 0; transform: translateY(14px); letter-spacing: 0.06em; }
+      to   { opacity: 1; transform: translateY(0);    letter-spacing: 0.02em; }
+    }
+
+    /* Small screens: smaller title so it never overflows */
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 2.1rem;
+        word-spacing: 0.05em;
+        letter-spacing: 0;
+      }
+    }
+
+    .jp {
+      font-family: "Noto Sans JP", sans-serif;
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       letter-spacing: 0.08em;
-      text-decoration: none;
-      color: #111;
+      opacity: 0.85;
     }
 
-    .nav {
+    /* ---------- Sections ---------- */
+    section.content {
+      min-height: 100vh;
+      padding: 100px 24px 80px;
       display: flex;
-      gap: 2rem;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: #15121f;
+      scroll-snap-align: start;
     }
-    .nav a {
-      color: #111;
+
+    section.content > * {
+      width: 100%;
+      max-width: var(--content-max);
+    }
+
+    section.content h2 {
+      font-family: "IBM Plex Serif", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(3rem, 9vw, 6.5rem);
+      line-height: 1;
+      letter-spacing: 0.02em;
+      margin-bottom: 40px;
+    }
+
+    section.content p {
+      opacity: 0.85;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .sub {
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin: 40px 0 16px;
+      opacity: 0.9;
+    }
+
+    /* Scroll reveal: elements fade and rise in when they come into view */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.show {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ---------- About me ---------- */
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 170px;
+      height: 170px;
+    }
+
+    .avatar svg,
+    .artist-pic svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .profile h3 {
+      margin-top: 16px;
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+
+    .pronouns {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      opacity: 0.6;
+    }
+
+    .bio {
+      margin-top: 16px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      opacity: 0.85;
+    }
+
+    /* Social pills: uniform, centered rows */
+    .socials {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+      max-width: 720px;
+    }
+
+    .socials a {
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
       text-decoration: none;
+      font-size: 0.8rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .socials a:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* ---------- Cards ---------- */
+    /* Centered grid: cards wrap in rows that are centered, more per row on wide screens */
+    .fav-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .fav-card {
+      flex: 1 1 300px;
+      max-width: 380px;
+      padding: 20px 22px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Artists: own row, but not stretched across very wide screens */
+    .fav-card.wide {
+      flex-basis: 100%;
+      max-width: 760px;
+    }
+
+    /* Stacked column: Videogames, Movies and TV Shows one above the other */
+    .stack {
+      flex: 0 0 100%;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .stack .fav-card {
+      flex: none;
+      max-width: none;
+    }
+
+    .fav-card h3 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .fav-card h3 a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .fav-card h3 a:hover { text-decoration: underline; }
+
+    .fav-card ul { list-style: none; }
+
+    .fav-card li {
+      padding: 4px 0;
       font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    /* Long lists (e.g. Fictional Characters) flow into two columns */
+    .fav-card ul.names {
+      columns: 2;
+      column-gap: 24px;
+    }
+
+    .fav-card ul.names li {
+      break-inside: avoid;
+    }
+
+    .fav-card li strong { font-weight: 600; }
+
+    .fav-card p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin: 0;
+      max-width: none;
+    }
+
+    .platforms {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+
+    /* ---------- Favorites: pictures ---------- */
+    /* Column count is set by script so every row is completely filled.
+       Each grid can be capped in width (data-max) so tiles stay small on big screens. */
+    .cover-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr)); /* replaced by script */
+      gap: 12px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .tile {
+      aspect-ratio: 2 / 3;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.06);
+      background-size: cover;
+      background-position: center;
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+    }
+
+    .artist-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .artist {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .artist-pic {
+      display: block;
+      width: 130px;
+      height: 130px;
+    }
+
+    .artist-name {
+      font-size: 0.95rem;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    /* ---------- Setup ---------- */
+    /* Narrow screens: picture on top, info cards below.
+       Wide screens: a tall block with the picture on the left (most of the width)
+       and the compact info cards on the right, grouped together in the middle. */
+    .setup-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (min-width: 1100px) {
+      .setup-layout {
+        grid-template-columns: minmax(0, 3.2fr) minmax(0, 1fr);
+        align-items: stretch;
+        min-height: clamp(560px, 90vh, 820px);
+      }
+    }
+
+    .setup-spot {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 20px;
+      background-color: rgba(255, 255, 255, 0.06);
+      background-size: cover;
+      background-position: center;
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    @media (min-width: 1100px) {
+      .setup-spot {
+        aspect-ratio: auto;
+        height: 100%;
+      }
+    }
+
+    .setup-spot:hover { transform: scale(1.02); }
+
+    /* Right column: compact PC Specs, OS Info and Equipment cards, grouped together */
+    .setup-info {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .setup-info .fav-card {
+      flex: none;
+      max-width: none;
+      padding: 14px 18px;
+    }
+
+    .setup-info .fav-card h3 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .setup-info .fav-card li {
+      padding: 1px 0;
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    @media (min-width: 1100px) {
+      .setup-info {
+        height: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* ---------- Footer ---------- */
+    footer {
+      position: relative;
+      padding: 56px 24px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      text-align: center;
+      background: #15121f;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      scroll-snap-align: end;
+    }
+
+    .clocks {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .clock {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .city {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .nav a:hover { text-decoration: underline; }
-
-    .login {
-      color: #111;
-      text-decoration: none;
-      font-size: 0.9rem;
-      border: 1px solid #111;
-      padding: 0.4rem 0.9rem;
-    }
-    .login:hover { background: #111; color: #fff; }
-
-    /* Inhalt */
-    main {
-      max-width: 800px;
-      margin: 4rem auto;
-      padding: 0 1.5rem;
+      opacity: 0.6;
     }
 
-    /* Smartphone */
-    @media (max-width: 700px) {
-      .header { flex-wrap: wrap; gap: 1rem; }
-      .nav { gap: 1rem; flex-wrap: wrap; }
+    .time {
+      font-size: 1.3rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .footer-name {
+      font-family: "IBM Plex Serif", Georgia, serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.04em;
+      opacity: 0.85;
+    }
+
+    /* Name appears slightly after the clocks */
+    footer .footer-name.reveal { transition-delay: 0.15s; }
+
+    /* Small note in the bottom right corner of the footer */
+    .ai-note {
+      position: absolute;
+      right: 24px;
+      bottom: 16px;
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
-
-  <div class="topbar">
-    Neuigkeiten jetzt entdecken — <a href="#">Mehr erfahren</a>
-  </div>
-
-  <header class="header">
-    <a href="#" class="logo">MEIN LOGO</a>
-
-    <nav class="nav">
-      <a href="#">Projekte</a>
-      <a href="#">Blog</a>
-      <a href="#">Über mich</a>
-      <a href="#">Kontakt</a>
+  <header class="glass">
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About me</a></li>
+        <li><a href="#favorites">Favorites</a></li>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#modding">Modding</a></li>
+      </ul>
     </nav>
-
-    <a href="#" class="login">Login</a>
   </header>
 
-  <main>
-    <h1>Willkommen</h1>
-    <p>Hier steht dein Inhalt.</p>
-  </main>
+  <section class="hero" id="home">
+    <h1>Welcome to my website</h1>
+    <p class="jp">ようこそ、私のウェブサイトへ</p>
+  </section>
 
+  <section class="content" id="about">
+    <h2>About me</h2>
+    <div class="profile">
+      <div class="avatar grow">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <!-- Scalloped outer shape: center circle plus 8 bumps -->
+          <g fill="#d0bcff">
+            <circle cx="100" cy="100" r="66"/>
+            <circle cx="166" cy="100" r="26"/>
+            <circle cx="146.67" cy="146.67" r="26"/>
+            <circle cx="100" cy="166" r="26"/>
+            <circle cx="53.33" cy="146.67" r="26"/>
+            <circle cx="34" cy="100" r="26"/>
+            <circle cx="53.33" cy="53.33" r="26"/>
+            <circle cx="100" cy="34" r="26"/>
+            <circle cx="146.67" cy="53.33" r="26"/>
+          </g>
+          <!-- Simple original figure -->
+          <circle cx="100" cy="88" r="22" fill="#381e72"/>
+          <path d="M55 150 C55 118 145 118 145 150 Z" fill="#381e72"/>
+        </svg>
+      </div>
+      <h3>Steiny</h3>
+      <p class="pronouns">any pronouns</p>
+      <p class="bio">Hi, im Steiny. A german thing.<br>I like video games, music, indie series, movies, fandoms, anime, cars, modding, linux, Nothing (R) and tech stuff.</p>
+
+      <div class="socials">
+        <a href="#" target="_blank" rel="noopener">GitHub</a>
+        <a href="#" target="_blank" rel="noopener">Instagram</a>
+        <a href="#" target="_blank" rel="noopener">Discord</a>
+        <a href="#" target="_blank" rel="noopener">TikTok</a>
+        <a href="#" target="_blank" rel="noopener">YouTube</a>
+        <a href="#" target="_blank" rel="noopener">Pinterest</a>
+        <a href="#" target="_blank" rel="noopener">Twitch</a>
+        <a href="#" target="_blank" rel="noopener">SoundCloud</a>
+        <a href="#" target="_blank" rel="noopener">Steam</a>
+        <a href="#" target="_blank" rel="noopener">Planet Minecraft</a>
+        <a href="#" target="_blank" rel="noopener">SteamGridDB</a>
+        <a href="#" target="_blank" rel="noopener">GameBanana</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="content" id="favorites">
+    <h2>Favorites</h2>
+    <div class="fav-grid">
+      <div class="stack">
+        <div class="fav-card">
+          <h3>Videogames</h3>
+          <!-- data-set: which list in coverImages (script) to take the pictures from -->
+          <!-- data-target: preferred tile width in px; data-max: optional maximum grid width in px -->
+          <div class="cover-grid" data-set="videogames" data-count="45" data-target="110"></div>
+        </div>
+        <div class="fav-card">
+          <h3>Movies</h3>
+          <div class="cover-grid" data-set="movies" data-count="10" data-target="90"></div>
+        </div>
+        <div class="fav-card">
+          <h3>TV Shows</h3>
+          <div class="cover-grid" data-set="tvshows" data-count="15"></div>
+        </div>
+      </div>
+      <div class="fav-card wide">
+        <h3>Artists</h3>
+        <div class="artist-row">
+          <div class="artist">
+            <div class="artist-pic grow">
+              <svg viewBox="0 0 200 200" aria-hidden="true">
+                <defs>
+                  <clipPath id="artist-clip-1">
+                    <path d="M100 20 C150 10 190 50 185 105 C180 160 150 190 100 185 C50 180 15 150 20 95 C25 40 55 25 100 20 Z"/>
+                  </clipPath>
+                </defs>
+                <rect width="200" height="200" fill="#ffd6e7" clip-path="url(#artist-clip-1)"/>
+                <!-- Put the picture path or URL in href -->
+                <image href="images/artists/joost-klein.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-1)"/>
+              </svg>
+            </div>
+            <p class="artist-name">Joost Klein</p>
+          </div>
+          <div class="artist">
+            <div class="artist-pic grow">
+              <svg viewBox="0 0 200 200" aria-hidden="true">
+                <defs>
+                  <clipPath id="artist-clip-2">
+                    <path d="M30 60 C30 20 90 10 120 30 C170 60 190 120 150 160 C110 195 40 180 25 130 C18 105 25 80 30 60 Z"/>
+                  </clipPath>
+                </defs>
+                <rect width="200" height="200" fill="#b9f0c4" clip-path="url(#artist-clip-2)"/>
+                <image href="images/artists/freddie-dredd.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-2)"/>
+              </svg>
+            </div>
+            <p class="artist-name">Freddie Dredd</p>
+          </div>
+          <div class="artist">
+            <div class="artist-pic grow">
+              <svg viewBox="0 0 200 200" aria-hidden="true">
+                <defs>
+                  <clipPath id="artist-clip-3">
+                    <circle cx="100" cy="100" r="66"/>
+                    <circle cx="166" cy="100" r="26"/>
+                    <circle cx="146.67" cy="146.67" r="26"/>
+                    <circle cx="100" cy="166" r="26"/>
+                    <circle cx="53.33" cy="146.67" r="26"/>
+                    <circle cx="34" cy="100" r="26"/>
+                    <circle cx="53.33" cy="53.33" r="26"/>
+                    <circle cx="100" cy="34" r="26"/>
+                    <circle cx="146.67" cy="53.33" r="26"/>
+                  </clipPath>
+                </defs>
+                <rect width="200" height="200" fill="#d0bcff" clip-path="url(#artist-clip-3)"/>
+                <image href="images/artists/filow.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-3)"/>
+              </svg>
+            </div>
+            <p class="artist-name">Filow</p>
+          </div>
+        </div>
+      </div>
+      <div class="fav-card">
+        <h3>Fictional Characters</h3>
+        <ul class="names">
+          <li>Angel Dust</li>
+          <li>Stolas</li>
+          <li>Moxxie</li>
+          <li>Millie</li>
+          <li>Deadpool</li>
+          <li>Arthur Morgan</li>
+          <li>Jax</li>
+          <li>N</li>
+          <li>Uzi</li>
+          <li>Gangle</li>
+          <li>Kinger</li>
+          <li>Pomni</li>
+          <li>Kenny</li>
+          <li>Towelie</li>
+          <li>King</li>
+          <li>Luz</li>
+          <li>Eda</li>
+          <li>Amity</li>
+          <li>Dipper</li>
+          <li>Mabel</li>
+          <li>Soos</li>
+          <li>Stan</li>
+          <li>Gotō Hitori</li>
+          <li>Lightning McQueen</li>
+          <li>Scott Pilgrim</li>
+          <li>Ramona Flowers</li>
+        </ul>
+      </div>
+      <div class="fav-card">
+        <h3>Cars</h3>
+        <ul>
+          <li>Nissan 180SX</li>
+          <li>Nissan R35</li>
+          <li>Lexus LS400</li>
+          <li>Lamboghini Aventador SVJ</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="content" id="setup">
+    <h2>Setup</h2>
+
+    <div class="setup-layout">
+      <!-- Put your setup picture path in url('...') -->
+      <div class="setup-spot" style="background-image: url('images/setup.jpg');"></div>
+
+      <div class="setup-info">
+        <div class="fav-card">
+          <h3>PC Specs</h3>
+          <ul>
+            <li><strong>CPU:</strong> AMD Ryzen 5 5600G</li>
+            <li><strong>GPU:</strong> NVIDIA RTX 4060 8GB</li>
+            <li><strong>RAM:</strong> 32GB</li>
+            <li><strong>Storage:</strong> 2TB</li>
+            <li><strong>Motherboard:</strong> Gigabyte B550M DS3H</li>
+          </ul>
+        </div>
+        <div class="fav-card">
+          <h3>OS Info</h3>
+          <ul>
+            <li><strong>OS/Distro:</strong> CachyOS</li>
+            <li><strong>Shell:</strong> Caelestia</li>
+            <li><strong>WM:</strong> Wayland</li>
+            <li><strong>Console:</strong> fish</li>
+          </ul>
+        </div>
+        <div class="fav-card">
+          <h3>Equipment</h3>
+          <ul>
+            <li><strong>Keyboard:</strong> Ajazz AK820 Pro</li>
+            <li><strong>Mouse:</strong> Steelseries Rival 3</li>
+            <li><strong>Mousepad:</strong> Nyfter Nyfpad XXL Topography (White)</li>
+            <li><strong>Headset:</strong> Somic G951S Pink</li>
+            <li><strong>Controller:</strong> Xbox Elite 2 (From Xbox Design Lab)</li>
+            <li><strong>VR Headset:</strong> Oculus/Meta Quest 2</li>
+            <li><strong>Phone:</strong> Nothing Phone (2a) / 12GB Ram</li>
+            <li><strong>Smartwatch:</strong> CMF Watch 3 Pro</li>
+            <li><strong>Headphones for phone:</strong> Apple Earpods</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content" id="modding">
+    <h2>Modding</h2>
+
+    <h3 class="sub" style="margin-top: 0;">Emulators</h3>
+    <div class="fav-grid">
+      <div class="fav-card">
+        <h3><a href="https://dolphin-emu.org" target="_blank" rel="noopener">Dolphin</a></h3>
+        <p>Emulator for GameCube and Wii games.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://suyu.dev/" target="_blank" rel="noopener">Suyu</a></h3>
+        <p>Emulator for Nintendo Switch games, continuing the yuzu project.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://citra-emu.org" target="_blank" rel="noopener">Citra</a></h3>
+        <p>Emulator for Nintendo 3DS games. Development has stopped.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://cemu.info" target="_blank" rel="noopener">Cemu</a></h3>
+        <p>Emulator for Wii U games.</p>
+        <p class="platforms">Platforms: Windows, Linux</p>
+      </div>
+    </div>
+
+    <h3 class="sub">PC Ports</h3>
+    <div class="fav-grid">
+      <div class="fav-card">
+        <h3><a href="https://sm64coopdx.com" target="_blank" rel="noopener">SM64 Coop Deluxe</a></h3>
+        <p>Online co-op mod for the Super Mario 64 PC port. You need your own ROM.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://flathub.org/apps/ca.parallel_launcher.ParallelLauncher" target="_blank" rel="noopener">Parallel Launcher</a></h3>
+        <p>Launcher for N64 games, both retail and homebrew.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="#" target="_blank" rel="noopener">SpaghettiKart</a></h3>
+        <p>Unofficial native PC port of Mario Kart 64. You need your own US ROM.</p>
+        <p class="platforms">Platforms: Windows, macOS, Linux</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="clocks">
+      <div class="clock">
+        <span class="city">Tokyo</span>
+        <span class="time" data-tz="Asia/Tokyo"></span>
+      </div>
+      <div class="clock">
+        <span class="city">London</span>
+        <span class="time" data-tz="Europe/London"></span>
+      </div>
+      <div class="clock">
+        <span class="city">New York</span>
+        <span class="time" data-tz="America/New_York"></span>
+      </div>
+    </div>
+    <p class="footer-name">Steiny <span id="year"></span></p>
+    <p class="ai-note">AI was used for this website</p>
+  </footer>
+
+  <script>
+    // ---------- Your images ----------
+    // Add the path or URL of each picture to the list it belongs to.
+    // The first entry goes to the first tile, the second to the second tile, and so on.
+    // Empty tiles stay as dashed placeholders.
+    const coverImages = {
+      videogames: [
+        // "images/games/01.jpg",
+        // "images/games/02.jpg",
+      ],
+      movies: [
+        // "images/movies/01.jpg",
+      ],
+      tvshows: [
+        // "images/tv/01.jpg",
+      ],
+    };
+
+    // Build the cover tiles from the lists above
+    document.querySelectorAll('.cover-grid[data-count]').forEach((grid) => {
+      const images = coverImages[grid.dataset.set] || [];
+      for (let i = 0; i < Number(grid.dataset.count); i++) {
+        const tile = document.createElement('div');
+        tile.className = 'tile grow';
+        if (images[i]) tile.style.backgroundImage = `url("${images[i]}")`;
+        grid.appendChild(tile);
+      }
+    });
+
+    // Row fitting: pick the column count (a divisor of the tile count) whose
+    // tile width is closest to the preferred size, so every row is completely filled.
+    // On narrow screens the preferred size shrinks too (width / 5), and an optional
+    // data-max caps the grid width.
+    const DEFAULT_TARGET = 150; // px, used when a grid has no data-target
+    const GAP = 12;             // must match the gap in .cover-grid
+
+    function fitCoverGrid(grid) {
+      const total = Number(grid.dataset.count);
+      const max = Number(grid.dataset.max) || Infinity;
+      const width = Math.min(grid.clientWidth, max);
+      if (!width) return;
+
+      grid.style.maxWidth = max === Infinity ? '' : `${max}px`;
+
+      const base = Number(grid.dataset.target) || DEFAULT_TARGET;
+      const target = Math.min(base, width / 5);
+
+      let best = 1;
+      let bestDiff = Infinity;
+      for (let cols = 1; cols <= total; cols++) {
+        if (total % cols !== 0) continue;
+        const tileWidth = (width - (cols - 1) * GAP) / cols;
+        const diff = Math.abs(tileWidth - target);
+        if (diff < bestDiff) {
+          bestDiff = diff;
+          best = cols;
+        }
+      }
+      grid.style.gridTemplateColumns = `repeat(${best}, minmax(0, 1fr))`;
+    }
+
+    function fitAllCoverGrids() {
+      document.querySelectorAll('.cover-grid[data-count]').forEach(fitCoverGrid);
+    }
+
+    fitAllCoverGrids();
+    window.addEventListener('resize', fitAllCoverGrids);
+
+    // Current year, updates on its own
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // World clocks
+    const formatTime = (tz) => new Intl.DateTimeFormat('en-GB', {
+      timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false,
+    });
+
+    function updateClocks() {
+      document.querySelectorAll('.time').forEach((el) => {
+        el.textContent = formatTime(el.dataset.tz).format(new Date());
+      });
+    }
+
+    updateClocks();
+    setInterval(updateClocks, 1000);
+
+    // Scroll reveal.
+    // Sections: the trigger line sits slightly above the bottom edge, so big blocks
+    // (like the tall Favorites grid) do not wait until they are mostly visible.
+    // Footer: no bottom margin, because the footer sits in the bottom area when the
+    // page is scrolled to the end and would otherwise never trigger.
+    function makeRevealObserver(rootMargin) {
+      return new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0, rootMargin });
+    }
+
+    const sectionTargets = document.querySelectorAll('section.content > *');
+    const footerTargets = document.querySelectorAll('footer .clocks, footer .footer-name');
+
+    sectionTargets.forEach((el) => el.classList.add('reveal'));
+    footerTargets.forEach((el) => el.classList.add('reveal'));
+
+    const sectionObserver = makeRevealObserver('0px 0px -10% 0px');
+    const footerObserver = makeRevealObserver('0px');
+
+    sectionTargets.forEach((el) => sectionObserver.observe(el));
+    footerTargets.forEach((el) => footerObserver.observe(el));
+  </script>
 </body>
 </html>
