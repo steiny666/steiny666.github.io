@@ -1,1 +1,2 @@
-# steiny666.github.io
+# AI Usage
+For the hole html but I prompted everything
