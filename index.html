@@ -54,8 +54,8 @@
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      width: min(90%, 480px);
-      padding: 14px 28px;
+      width: min(92%, 560px);
+      padding: 14px 20px;
       border-radius: 999px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
       z-index: 100;
@@ -65,7 +65,8 @@
       list-style: none;
       display: flex;
       justify-content: center;
-      gap: 12px;
+      flex-wrap: wrap; /* on very small screens the last link wraps as a whole instead of breaking mid-word */
+      gap: 6px 12px;
     }
 
     nav a {
@@ -73,12 +74,19 @@
       text-decoration: none;
       font-weight: 500;
       opacity: 0.9;
+      white-space: nowrap; /* links never break into two lines */
       transition: opacity 0.2s, transform 0.2s;
     }
 
     nav a:hover {
       opacity: 1;
       transform: translateY(-1px);
+    }
+
+    /* Very small screens: slightly tighter pill and smaller text */
+    @media (max-width: 420px) {
+      header { padding: 12px 14px; }
+      nav a { font-size: 0.85rem; }
     }
 
     /* ---------- Hero (home) ---------- */
@@ -187,7 +195,7 @@
       transform: none;
     }
 
-    /* ---------- About me ---------- */
+    /* ---------- About Me ---------- */
     .profile {
       display: flex;
       flex-direction: column;
