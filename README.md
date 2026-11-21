@@ -1,2 +1,2 @@
 # AI Usage
-For the hole html but I prompted everything
+Was used for the the html, not the ideas
