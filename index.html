@@ -3,18 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Steiny</title>
+  <title>My Site</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@300;400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
   <style>
     /* ---------- Base ---------- */
     :root {
       --content-max: 1600px; /* how wide the content gets on big screens */
 
       /* Hero background. Replace with your own image, e.g.:
-         --hero-bg: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45)), url("images/hero.jpg");  */
+         --hero-bg: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45)), url("images/banner.jpg");  */
       --hero-bg: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+
+      --tile-w: 110px; /* width of all cover tiles, set by script */
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -54,8 +56,8 @@
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      width: min(92%, 560px);
-      padding: 14px 20px;
+      width: min(90%, 480px);
+      padding: 14px 28px;
       border-radius: 999px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
       z-index: 100;
@@ -65,8 +67,7 @@
       list-style: none;
       display: flex;
       justify-content: center;
-      flex-wrap: wrap; /* on very small screens the last link wraps as a whole instead of breaking mid-word */
-      gap: 6px 12px;
+      gap: 12px;
     }
 
     nav a {
@@ -74,7 +75,7 @@
       text-decoration: none;
       font-weight: 500;
       opacity: 0.9;
-      white-space: nowrap; /* links never break into two lines */
+      white-space: nowrap; /* a link never breaks onto two lines */
       transition: opacity 0.2s, transform 0.2s;
     }
 
@@ -83,10 +84,16 @@
       transform: translateY(-1px);
     }
 
-    /* Very small screens: slightly tighter pill and smaller text */
-    @media (max-width: 420px) {
-      header { padding: 12px 14px; }
-      nav a { font-size: 0.85rem; }
+    /* Small screens: tighter header so all five links stay on one line */
+    @media (max-width: 600px) {
+      header {
+        width: 94%;
+        padding: 12px 14px;
+      }
+
+      nav ul { gap: 8px; }
+
+      nav a { font-size: 0.8rem; }
     }
 
     /* ---------- Hero (home) ---------- */
@@ -98,7 +105,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 14px;
+      gap: 20px;
       padding: 0 24px;
       text-align: center;
       background-color: #764ba2;
@@ -110,37 +117,52 @@
 
     .hero h1 {
       font-family: "IBM Plex Serif", Georgia, serif;
-      font-weight: 400;
-      font-size: clamp(2rem, 7vw, 5rem);
-      letter-spacing: 0.02em;
-      word-spacing: 0.15em;
-      line-height: 1.1;
+      font-weight: 300;
+      font-size: clamp(2.2rem, 6vw, 4.6rem);
+      letter-spacing: 0.01em;
+      line-height: 1.05;
       max-width: 100%;
       text-wrap: balance;
       overflow-wrap: break-word;
       animation: spawn 1.2s ease-out both;
     }
 
+    /* Thin line between the English and the Japanese title */
+    .hero .divider {
+      display: block;
+      width: 56px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.6);
+      animation: spawn 1.2s ease-out 0.15s both;
+    }
+
     @keyframes spawn {
-      from { opacity: 0; transform: translateY(14px); letter-spacing: 0.06em; }
-      to   { opacity: 1; transform: translateY(0);    letter-spacing: 0.02em; }
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Japanese line: light, widely spaced, fades in a little after the English title */
+    .jp {
+      font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+      font-weight: 300;
+      font-size: 0.95rem;
+      letter-spacing: 0.3em;
+      text-indent: 0.3em; /* balances the trailing letter-spacing so the line is truly centered */
+      opacity: 0.8;
+      animation: spawn 1.2s ease-out 0.3s both;
     }
 
     /* Small screens: smaller title so it never overflows */
     @media (max-width: 600px) {
       .hero h1 {
         font-size: 2.1rem;
-        word-spacing: 0.05em;
-        letter-spacing: 0;
       }
-    }
 
-    .jp {
-      font-family: "Noto Sans JP", sans-serif;
-      font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: 0.08em;
-      opacity: 0.85;
+      .jp {
+        font-size: 0.85rem;
+        letter-spacing: 0.2em;
+        text-indent: 0.2em;
+      }
     }
 
     /* ---------- Sections ---------- */
@@ -195,7 +217,7 @@
       transform: none;
     }
 
-    /* ---------- About Me ---------- */
+    /* ---------- About me ---------- */
     .profile {
       display: flex;
       flex-direction: column;
@@ -214,10 +236,38 @@
       display: block;
     }
 
+    /* The colored shape turns slowly; pictures and figures on top stay still */
+    .spin {
+      transform-box: view-box;
+      transform-origin: 100px 100px;
+      animation: spin 24s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .spin { animation: none; }
+    }
+
     .profile h3 {
       margin-top: 16px;
       font-size: 1.4rem;
       font-weight: 500;
+    }
+
+    /* Wide screens: bigger profile picture and name */
+    @media (min-width: 1100px) {
+      .avatar {
+        width: 240px;
+        height: 240px;
+      }
+
+      .profile h3 {
+        margin-top: 22px;
+        font-size: 2.2rem;
+      }
     }
 
     .pronouns {
@@ -233,7 +283,7 @@
       opacity: 0.85;
     }
 
-    /* Social pills: uniform, centered rows */
+    /* Social pills: uniform, centered rows, each with its platform icon */
     .socials {
       display: flex;
       flex-wrap: wrap;
@@ -244,6 +294,9 @@
     }
 
     .socials a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       padding: 7px 14px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.12);
@@ -259,6 +312,28 @@
     .socials a:hover {
       background: rgba(255, 255, 255, 0.25);
       transform: translateY(-2px);
+    }
+
+    /* Platform icon, logo style: a single-color logo drawn in the link's text color */
+    .ico {
+      flex: 0 0 auto;
+      width: 15px;
+      height: 15px;
+      background: currentColor;
+      -webkit-mask: var(--src) center / contain no-repeat;
+      mask: var(--src) center / contain no-repeat;
+    }
+
+    /* Platform icon, outline style: for platforms without a logo in the icon set */
+    .ico-svg {
+      flex: 0 0 auto;
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     /* ---------- Cards ---------- */
@@ -287,18 +362,42 @@
       max-width: 760px;
     }
 
-    /* Stacked column: Videogames, Movies and TV Shows one above the other */
-    .stack {
-      flex: 0 0 100%;
-      max-width: 100%;
+    /* Two-column favorites layout.
+       Narrow screens: one column (Videogames, Movies, TV Shows, then Artists, Fictional Characters, Cars).
+       Wide screens: left column = picture grids (flexible), right column = Artists, Fictional Characters, Cars (fixed 420px). */
+    .fav-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+      width: 100%;
+      align-items: start;
+    }
+
+    @media (min-width: 1100px) {
+      .fav-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+      }
+    }
+
+    /* Column of stacked cards */
+    .col {
       display: flex;
       flex-direction: column;
       gap: 16px;
+      min-width: 0;
     }
 
-    .stack .fav-card {
+    .col .fav-card {
       flex: none;
       max-width: none;
+    }
+
+    /* Artists in the narrower right column: slightly smaller pictures so all three fit in one row */
+    .col .artist-row { gap: 20px; }
+
+    .col .artist-pic {
+      width: 110px;
+      height: 110px;
     }
 
     .fav-card h3 {
@@ -320,6 +419,16 @@
       padding: 4px 0;
       font-size: 0.9rem;
       opacity: 0.85;
+    }
+
+    /* Names and cars link to their wiki: keep the list look, underline on hover */
+    .fav-card li a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .fav-card li a:hover {
+      text-decoration: underline;
     }
 
     /* Long lists (e.g. Fictional Characters) flow into two columns */
@@ -348,17 +457,20 @@
     }
 
     /* ---------- Favorites: pictures ---------- */
-    /* Column count is set by script so every row is completely filled.
-       Each grid can be capped in width (data-max) so tiles stay small on big screens. */
+    /* All cover tiles share one size (--tile-w, set by script).
+       Tiles are centered in rows, and the script fills the last row so every row is full. */
     .cover-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr)); /* replaced by script */
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 12px;
       width: 100%;
       margin: 0 auto;
     }
 
     .tile {
+      flex: 0 0 var(--tile-w);
+      width: var(--tile-w);
       aspect-ratio: 2 / 3;
       border-radius: 10px;
       background-color: rgba(255, 255, 255, 0.06);
@@ -392,6 +504,49 @@
       font-size: 0.95rem;
       font-weight: 500;
       opacity: 0.9;
+    }
+
+    /* Wide screens: the whole Favorites section fits on one screen (height: 100vh).
+       Cards and text are a bit more compact so the right column fits too.
+       The tile size is calculated by the script so the picture grids fit the height. */
+    @media (min-width: 1100px) {
+      .fav-section {
+        height: 100vh;
+        padding: 88px 24px 24px;
+      }
+
+      .fav-section h2 {
+        font-size: clamp(2.4rem, 6vh, 4rem);
+        margin-bottom: 20px;
+      }
+
+      .fav-section .fav-layout { gap: 12px; }
+
+      .fav-section .col { gap: 12px; }
+
+      .fav-section .fav-card { padding: 14px 18px; }
+
+      .fav-section .fav-card h3 {
+        font-size: 1rem;
+        margin-bottom: 8px;
+      }
+
+      .fav-section .fav-card li {
+        padding: 1px 0;
+        font-size: 0.82rem;
+        line-height: 1.35;
+      }
+
+      .fav-section .col .artist-row { gap: 14px; }
+
+      .fav-section .col .artist-pic {
+        width: 96px;
+        height: 96px;
+      }
+
+      .fav-section .artist { gap: 6px; }
+
+      .fav-section .artist-name { font-size: 0.85rem; }
     }
 
     /* ---------- Setup ---------- */
@@ -540,7 +695,8 @@
 
   <section class="hero" id="home">
     <h1>Welcome to my website</h1>
-    <p class="jp">ようこそ、私のウェブサイトへ</p>
+    <span class="divider" aria-hidden="true"></span>
+    <p class="jp" lang="ja">ようこそ、私のウェブサイトへ</p>
   </section>
 
   <section class="content" id="about">
@@ -548,8 +704,8 @@
     <div class="profile">
       <div class="avatar grow">
         <svg viewBox="0 0 200 200" aria-hidden="true">
-          <!-- Scalloped outer shape: center circle plus 8 bumps -->
-          <g fill="#d0bcff">
+          <!-- Scalloped outer shape: center circle plus 8 bumps, turning slowly -->
+          <g class="spin" fill="#d0bcff">
             <circle cx="100" cy="100" r="66"/>
             <circle cx="166" cy="100" r="26"/>
             <circle cx="146.67" cy="146.67" r="26"/>
@@ -560,7 +716,7 @@
             <circle cx="100" cy="34" r="26"/>
             <circle cx="146.67" cy="53.33" r="26"/>
           </g>
-          <!-- Simple original figure -->
+          <!-- Simple original figure (stays still) -->
           <circle cx="100" cy="88" r="22" fill="#381e72"/>
           <path d="M55 150 C55 118 145 118 145 150 Z" fill="#381e72"/>
         </svg>
@@ -569,137 +725,164 @@
       <p class="pronouns">any pronouns</p>
       <p class="bio">Hi, im Steiny. A german thing.<br>I like video games, music, indie series, movies, fandoms, anime, cars, modding, linux, Nothing (R) and tech stuff.</p>
 
+      <!-- Order: social, videos and streams, music, code, then gaming and mods.
+           Icons: Simple Icons (single-color logos) from the jsDelivr CDN, except Planet Minecraft
+           and SteamGridDB, which use simple outline icons drawn here.
+           Discord and Pinterest still need their links (href="#" for now). -->
       <div class="socials">
-        <a href="#" target="_blank" rel="noopener">GitHub</a>
-        <a href="#" target="_blank" rel="noopener">Instagram</a>
-        <a href="#" target="_blank" rel="noopener">Discord</a>
-        <a href="#" target="_blank" rel="noopener">TikTok</a>
-        <a href="#" target="_blank" rel="noopener">YouTube</a>
-        <a href="#" target="_blank" rel="noopener">Pinterest</a>
-        <a href="#" target="_blank" rel="noopener">Twitch</a>
-        <a href="#" target="_blank" rel="noopener">SoundCloud</a>
-        <a href="#" target="_blank" rel="noopener">Steam</a>
-        <a href="#" target="_blank" rel="noopener">Planet Minecraft</a>
-        <a href="#" target="_blank" rel="noopener">SteamGridDB</a>
-        <a href="#" target="_blank" rel="noopener">GameBanana</a>
+        <a href="https://www.instagram.com/steiny_666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/instagram.svg')"></span>Instagram</a>
+        <a href="https://www.tiktok.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/tiktok.svg')"></span>TikTok</a>
+        <a href="https://www.youtube.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/youtube.svg')"></span>YouTube</a>
+        <a href="https://twitch.tv/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/twitch.svg')"></span>Twitch</a>
+        <a href="#" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/discord.svg')"></span>Discord</a>
+        <a href="#" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/pinterest.svg')"></span>Pinterest</a>
+        <a href="https://soundcloud.com/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/soundcloud.svg')"></span>SoundCloud</a>
+        <a href="https://github.com/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/github.svg')"></span>GitHub</a>
+        <a href="https://steamcommunity.com/id/steiny666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/steam.svg')"></span>Steam</a>
+        <a href="https://www.steamgriddb.com/profile/76561199380229448" target="_blank" rel="noopener"><svg class="ico-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>SteamGridDB</a>
+        <a href="https://gamebanana.com/members/4800550" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/gamebanana.svg')"></span>GameBanana</a>
+        <a href="https://www.planetminecraft.com/member/steiny666/" target="_blank" rel="noopener"><svg class="ico-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>Planet Minecraft</a>
       </div>
     </div>
   </section>
 
-  <section class="content" id="favorites">
+  <section class="content fav-section" id="favorites">
     <h2>Favorites</h2>
-    <div class="fav-grid">
-      <div class="stack">
+    <div class="fav-layout">
+      <div class="col">
         <div class="fav-card">
           <h3>Videogames</h3>
-          <!-- data-set: which list in coverImages (script) to take the pictures from -->
-          <!-- data-target: preferred tile width in px; data-max: optional maximum grid width in px -->
-          <div class="cover-grid" data-set="videogames" data-count="45" data-target="110"></div>
+          <!-- data-set: which list in coverImages (script) to take the pictures from.
+               data-count: minimum number of tiles (the script adds more to fill the last row) -->
+          <div class="cover-grid" data-set="videogames" data-count="45"></div>
         </div>
         <div class="fav-card">
           <h3>Movies</h3>
-          <div class="cover-grid" data-set="movies" data-count="10" data-target="90"></div>
+          <div class="cover-grid" data-set="movies" data-count="10"></div>
         </div>
         <div class="fav-card">
           <h3>TV Shows</h3>
-          <div class="cover-grid" data-set="tvshows" data-count="15"></div>
+          <!-- The TV Shows grid is the reference for the width; all grids share the tile size -->
+          <div class="cover-grid" data-set="tvshows" data-count="16"></div>
         </div>
       </div>
-      <div class="fav-card wide">
-        <h3>Artists</h3>
-        <div class="artist-row">
-          <div class="artist">
-            <div class="artist-pic grow">
-              <svg viewBox="0 0 200 200" aria-hidden="true">
-                <defs>
-                  <clipPath id="artist-clip-1">
-                    <path d="M100 20 C150 10 190 50 185 105 C180 160 150 190 100 185 C50 180 15 150 20 95 C25 40 55 25 100 20 Z"/>
-                  </clipPath>
-                </defs>
-                <rect width="200" height="200" fill="#ffd6e7" clip-path="url(#artist-clip-1)"/>
-                <!-- Put the picture path or URL in href -->
-                <image href="images/artists/joost-klein.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-1)"/>
-              </svg>
+
+      <div class="col">
+        <div class="fav-card">
+          <h3>Artists</h3>
+          <div class="artist-row">
+            <div class="artist">
+              <div class="artist-pic grow">
+                <svg viewBox="0 0 200 200" aria-hidden="true">
+                  <defs>
+                    <!-- Wavy cookie shape: a center circle plus 10 soft bumps -->
+                    <clipPath id="artist-clip-1">
+                      <circle cx="100" cy="100" r="62"/>
+                      <circle cx="162" cy="100" r="28"/>
+                      <circle cx="150.2" cy="136.4" r="28"/>
+                      <circle cx="119.2" cy="158.9" r="28"/>
+                      <circle cx="80.8" cy="158.9" r="28"/>
+                      <circle cx="49.8" cy="136.4" r="28"/>
+                      <circle cx="38" cy="100" r="28"/>
+                      <circle cx="49.8" cy="63.6" r="28"/>
+                      <circle cx="80.8" cy="41.1" r="28"/>
+                      <circle cx="119.2" cy="41.1" r="28"/>
+                      <circle cx="150.2" cy="63.6" r="28"/>
+                    </clipPath>
+                  </defs>
+                  <!-- Spinning colored shape -->
+                  <g class="spin">
+                    <rect width="200" height="200" fill="#ffd6e7" clip-path="url(#artist-clip-1)"/>
+                  </g>
+                  <!-- Picture stays still; put the picture path or URL in href -->
+                  <image href="images/artists/joost-klein.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-1)"/>
+                </svg>
+              </div>
+              <p class="artist-name">Joost Klein</p>
             </div>
-            <p class="artist-name">Joost Klein</p>
-          </div>
-          <div class="artist">
-            <div class="artist-pic grow">
-              <svg viewBox="0 0 200 200" aria-hidden="true">
-                <defs>
-                  <clipPath id="artist-clip-2">
-                    <path d="M30 60 C30 20 90 10 120 30 C170 60 190 120 150 160 C110 195 40 180 25 130 C18 105 25 80 30 60 Z"/>
-                  </clipPath>
-                </defs>
-                <rect width="200" height="200" fill="#b9f0c4" clip-path="url(#artist-clip-2)"/>
-                <image href="images/artists/freddie-dredd.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-2)"/>
-              </svg>
+            <div class="artist">
+              <div class="artist-pic grow">
+                <svg viewBox="0 0 200 200" aria-hidden="true">
+                  <defs>
+                    <!-- Lumpy blob with five soft lobes, like the reference picture; scaled up 10% around the center -->
+                    <clipPath id="artist-clip-2">
+                      <path transform="translate(100 100) scale(1.1) translate(-100 -100)" d="M100 12 C74 12 82.2 31.3 61.2 46.6 C40.2 61.9 24.3 48.1 16.3 72.8 C8.3 97.5 29.2 95.7 37.2 120.4 C45.2 145.1 27.3 155.9 48.3 171.2 C69.3 186.5 74 166 100 166 C126 166 130.7 186.5 151.7 171.2 C172.7 155.9 154.8 145.1 162.8 120.4 C170.8 95.7 191.7 97.5 183.7 72.8 C175.7 48.1 159.8 61.9 138.8 46.6 C117.8 31.3 126 12 100 12 Z"/>
+                    </clipPath>
+                  </defs>
+                  <g class="spin">
+                    <rect width="200" height="200" fill="#b9f0c4" clip-path="url(#artist-clip-2)"/>
+                  </g>
+                  <image href="images/artists/freddie-dredd.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-2)"/>
+                </svg>
+              </div>
+              <p class="artist-name">Freddie Dredd</p>
             </div>
-            <p class="artist-name">Freddie Dredd</p>
-          </div>
-          <div class="artist">
-            <div class="artist-pic grow">
-              <svg viewBox="0 0 200 200" aria-hidden="true">
-                <defs>
-                  <clipPath id="artist-clip-3">
-                    <circle cx="100" cy="100" r="66"/>
-                    <circle cx="166" cy="100" r="26"/>
-                    <circle cx="146.67" cy="146.67" r="26"/>
-                    <circle cx="100" cy="166" r="26"/>
-                    <circle cx="53.33" cy="146.67" r="26"/>
-                    <circle cx="34" cy="100" r="26"/>
-                    <circle cx="53.33" cy="53.33" r="26"/>
-                    <circle cx="100" cy="34" r="26"/>
-                    <circle cx="146.67" cy="53.33" r="26"/>
-                  </clipPath>
-                </defs>
-                <rect width="200" height="200" fill="#d0bcff" clip-path="url(#artist-clip-3)"/>
-                <image href="images/artists/filow.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-3)"/>
-              </svg>
+            <div class="artist">
+              <div class="artist-pic grow">
+                <svg viewBox="0 0 200 200" aria-hidden="true">
+                  <defs>
+                    <!-- Flower shape: six overlapping circles plus a filled center (no hole) -->
+                    <clipPath id="artist-clip-3">
+                      <circle cx="100" cy="100" r="50"/>
+                      <circle cx="150" cy="100" r="48"/>
+                      <circle cx="125" cy="143.3" r="48"/>
+                      <circle cx="75" cy="143.3" r="48"/>
+                      <circle cx="50" cy="100" r="48"/>
+                      <circle cx="75" cy="56.7" r="48"/>
+                      <circle cx="125" cy="56.7" r="48"/>
+                    </clipPath>
+                  </defs>
+                  <g class="spin">
+                    <rect width="200" height="200" fill="#d0bcff" clip-path="url(#artist-clip-3)"/>
+                  </g>
+                  <image href="images/artists/filow.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-3)"/>
+                </svg>
+              </div>
+              <p class="artist-name">Filow</p>
             </div>
-            <p class="artist-name">Filow</p>
           </div>
         </div>
-      </div>
-      <div class="fav-card">
-        <h3>Fictional Characters</h3>
-        <ul class="names">
-          <li>Angel Dust</li>
-          <li>Stolas</li>
-          <li>Moxxie</li>
-          <li>Millie</li>
-          <li>Deadpool</li>
-          <li>Arthur Morgan</li>
-          <li>Jax</li>
-          <li>N</li>
-          <li>Uzi</li>
-          <li>Gangle</li>
-          <li>Kinger</li>
-          <li>Pomni</li>
-          <li>Kenny</li>
-          <li>Towelie</li>
-          <li>King</li>
-          <li>Luz</li>
-          <li>Eda</li>
-          <li>Amity</li>
-          <li>Dipper</li>
-          <li>Mabel</li>
-          <li>Soos</li>
-          <li>Stan</li>
-          <li>Gotō Hitori</li>
-          <li>Lightning McQueen</li>
-          <li>Scott Pilgrim</li>
-          <li>Ramona Flowers</li>
-        </ul>
-      </div>
-      <div class="fav-card">
-        <h3>Cars</h3>
-        <ul>
-          <li>Nissan 180SX</li>
-          <li>Nissan R35</li>
-          <li>Lexus LS400</li>
-          <li>Lamboghini Aventador SVJ</li>
-        </ul>
+        <div class="fav-card">
+          <h3>Fictional Characters</h3>
+          <!-- Each name links to its fandom wiki page -->
+          <ul class="names">
+            <li><a href="https://helluva-boss.fandom.com/wiki/Angel_Dust" target="_blank" rel="noopener">Angel Dust</a></li>
+            <li><a href="https://helluva-boss.fandom.com/wiki/Stolas" target="_blank" rel="noopener">Stolas</a></li>
+            <li><a href="https://helluva-boss.fandom.com/wiki/Moxxie" target="_blank" rel="noopener">Moxxie</a></li>
+            <li><a href="https://helluva-boss.fandom.com/wiki/Millie" target="_blank" rel="noopener">Millie</a></li>
+            <li><a href="https://marvel.fandom.com/wiki/Deadpool" target="_blank" rel="noopener">Deadpool</a></li>
+            <li><a href="https://reddeadredemption.fandom.com/wiki/Arthur_Morgan" target="_blank" rel="noopener">Arthur Morgan</a></li>
+            <li><a href="https://amazing-digital-circus.fandom.com/wiki/Jax" target="_blank" rel="noopener">Jax</a></li>
+            <li><a href="https://murder-drones.fandom.com/wiki/N" target="_blank" rel="noopener">N</a></li>
+            <li><a href="https://murder-drones.fandom.com/wiki/Uzi_Doorman" target="_blank" rel="noopener">Uzi</a></li>
+            <li><a href="https://amazing-digital-circus.fandom.com/wiki/Gangle" target="_blank" rel="noopener">Gangle</a></li>
+            <li><a href="https://amazing-digital-circus.fandom.com/wiki/Kinger" target="_blank" rel="noopener">Kinger</a></li>
+            <li><a href="https://amazing-digital-circus.fandom.com/wiki/Pomni" target="_blank" rel="noopener">Pomni</a></li>
+            <li><a href="https://southpark.fandom.com/wiki/Kenny_McCormick" target="_blank" rel="noopener">Kenny</a></li>
+            <li><a href="https://southpark.fandom.com/wiki/Towelie" target="_blank" rel="noopener">Towelie</a></li>
+            <li><a href="https://adventuretime.fandom.com/wiki/King" target="_blank" rel="noopener">King</a></li>
+            <li><a href="https://owl-house.fandom.com/wiki/Luz_Noceda" target="_blank" rel="noopener">Luz</a></li>
+            <li><a href="https://owl-house.fandom.com/wiki/Eda_Clawthorne" target="_blank" rel="noopener">Eda</a></li>
+            <li><a href="https://owl-house.fandom.com/wiki/Amity_Blight" target="_blank" rel="noopener">Amity</a></li>
+            <li><a href="https://gravityfalls.fandom.com/wiki/Dipper_Pines" target="_blank" rel="noopener">Dipper</a></li>
+            <li><a href="https://gravityfalls.fandom.com/wiki/Mabel_Pines" target="_blank" rel="noopener">Mabel</a></li>
+            <li><a href="https://gravityfalls.fandom.com/wiki/Soos_Ramirez" target="_blank" rel="noopener">Soos</a></li>
+            <li><a href="https://gravityfalls.fandom.com/wiki/Stan_Pines" target="_blank" rel="noopener">Stan</a></li>
+            <li><a href="https://bocchi-the-rock.fandom.com/wiki/Hitori_Gotoh" target="_blank" rel="noopener">Gotō Hitori</a></li>
+            <li><a href="https://cars.fandom.com/wiki/Lightning_McQueen" target="_blank" rel="noopener">Lightning McQueen</a></li>
+            <li><a href="https://scottpilgrim.fandom.com/wiki/Scott_Pilgrim" target="_blank" rel="noopener">Scott Pilgrim</a></li>
+            <li><a href="https://scottpilgrim.fandom.com/wiki/Ramona_Flowers" target="_blank" rel="noopener">Ramona Flowers</a></li>
+          </ul>
+        </div>
+        <div class="fav-card">
+          <h3>Cars</h3>
+          <ul>
+            <li><a href="https://en.wikipedia.org/wiki/Nissan_180SX" target="_blank" rel="noopener">Nissan 180SX</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Nissan_GT-R" target="_blank" rel="noopener">Nissan R35</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Lexus_LS" target="_blank" rel="noopener">Lexus LS400</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Lamborghini_Aventador" target="_blank" rel="noopener">Lamborghini Aventador SVJ</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -752,7 +935,8 @@
   <section class="content" id="modding">
     <h2>Modding</h2>
 
-    <h3 class="sub" style="margin-top: 0;">Emulators</h3>
+    <!-- Emulators, grouped by manufacturer: Nintendo first, then PlayStation, Sega, Xbox -->
+    <h3 class="sub" style="margin-top: 0;">Nintendo</h3>
     <div class="fav-grid">
       <div class="fav-card">
         <h3><a href="https://dolphin-emu.org" target="_blank" rel="noopener">Dolphin</a></h3>
@@ -772,6 +956,78 @@
       <div class="fav-card">
         <h3><a href="https://cemu.info" target="_blank" rel="noopener">Cemu</a></h3>
         <p>Emulator for Wii U games.</p>
+        <p class="platforms">Platforms: Windows, Linux</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://ares-emu.net" target="_blank" rel="noopener">ares</a></h3>
+        <p>Multi-system emulator for NES, SNES, Nintendo 64, Game Boy and Game Boy Advance.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://mgba.io" target="_blank" rel="noopener">mGBA</a></h3>
+        <p>Accurate emulator for Game Boy, Game Boy Color and Game Boy Advance.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://melonds.kuribo64.net" target="_blank" rel="noopener">melonDS</a></h3>
+        <p>Emulator for Nintendo DS games, with good compatibility and speed.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS</p>
+      </div>
+    </div>
+
+    <h3 class="sub">PlayStation</h3>
+    <div class="fav-grid">
+      <div class="fav-card">
+        <h3><a href="https://github.com/stenzek/duckstation" target="_blank" rel="noopener">DuckStation</a></h3>
+        <p>Emulator for PlayStation 1 games, easy to set up.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://pcsx2.net" target="_blank" rel="noopener">PCSX2</a></h3>
+        <p>The best-known emulator for PlayStation 2 games.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://rpcs3.net" target="_blank" rel="noopener">RPCS3</a></h3>
+        <p>Emulator for PlayStation 3 games. Compatibility varies a lot from game to game.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://www.ppsspp.org" target="_blank" rel="noopener">PPSSPP</a></h3>
+        <p>Emulator for PlayStation Portable games, runs well on PC and phones.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS, Android, iOS</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://vita3k.org" target="_blank" rel="noopener">Vita3K</a></h3>
+        <p>Emulator for PlayStation Vita games, still in active development.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+      </div>
+    </div>
+
+    <h3 class="sub">Sega</h3>
+    <div class="fav-grid">
+      <div class="fav-card">
+        <h3><a href="https://github.com/flyinghead/flycast" target="_blank" rel="noopener">Flycast</a></h3>
+        <p>Emulator for Sega Dreamcast games.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://www.retroarch.com" target="_blank" rel="noopener">RetroArch</a></h3>
+        <p>Frontend with many cores, including Sega Saturn. Good for Saturn games.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+      </div>
+    </div>
+
+    <h3 class="sub">Xbox</h3>
+    <div class="fav-grid">
+      <div class="fav-card">
+        <h3><a href="https://xemu.app" target="_blank" rel="noopener">xemu</a></h3>
+        <p>Emulator for the original Xbox.</p>
+        <p class="platforms">Platforms: Windows, Linux, macOS</p>
+      </div>
+      <div class="fav-card">
+        <h3><a href="https://xenia.jp" target="_blank" rel="noopener">Xenia</a></h3>
+        <p>Emulator for Xbox 360 games. Compatibility is still growing.</p>
         <p class="platforms">Platforms: Windows, Linux</p>
       </div>
     </div>
@@ -833,55 +1089,94 @@
       ],
     };
 
-    // Build the cover tiles from the lists above
-    document.querySelectorAll('.cover-grid[data-count]').forEach((grid) => {
+    // ---------- Cover tiles: one size, always full rows, fits the screen ----------
+    // Narrow screens: the number of tiles per row comes from the width (about 3 to 8).
+    // Wide screens: the script picks the largest tiles that fit the height of the
+    // Favorites section, so the whole section is visible without scrolling.
+    // Every grid gets the same tile size, and its tile count is raised to a multiple
+    // of the number of columns, so the last row is always full.
+    const TILE_GAP = 12;   // must match the gap in .cover-grid
+    const TILE_RATIO = 1.5; // tile height = tile width * 1.5 (aspect ratio 2 / 3)
+    const favSection = document.getElementById('favorites');
+    const favLeftCol = favSection.querySelector('.fav-layout > .col');
+    const sizeGrid = document.querySelector('.cover-grid[data-set="tvshows"]');
+    const coverGrids = document.querySelectorAll('.cover-grid[data-count]');
+    let lastCols = 0;
+
+    // Number of tiles a grid needs (at least data-count, at least one per image)
+    function countFor(grid) {
       const images = coverImages[grid.dataset.set] || [];
-      for (let i = 0; i < Number(grid.dataset.count); i++) {
-        const tile = document.createElement('div');
-        tile.className = 'tile grow';
-        if (images[i]) tile.style.backgroundImage = `url("${images[i]}")`;
-        grid.appendChild(tile);
+      return Math.max(Number(grid.dataset.count), images.length);
+    }
+
+    // Height of one grid with a given number of columns and tile width
+    function gridHeight(count, cols, tile) {
+      const rows = Math.ceil(count / cols);
+      return rows * tile * TILE_RATIO + (rows - 1) * TILE_GAP;
+    }
+
+    // Tile width for a number of columns, so that the row fills the width exactly
+    function tileFor(width, cols) {
+      return (width - (cols - 1) * TILE_GAP - 1) / cols; // -1px keeps rounding safe
+    }
+
+    function calcLayout(width) {
+      const isWide = window.matchMedia('(min-width: 1100px)').matches;
+
+      if (!isWide) {
+        const cols = Math.max(3, Math.min(8, Math.round(width / 115)));
+        return { cols, tile: tileFor(width, cols) };
       }
-    });
 
-    // Row fitting: pick the column count (a divisor of the tile count) whose
-    // tile width is closest to the preferred size, so every row is completely filled.
-    // On narrow screens the preferred size shrinks too (width / 5), and an optional
-    // data-max caps the grid width.
-    const DEFAULT_TARGET = 150; // px, used when a grid has no data-target
-    const GAP = 12;             // must match the gap in .cover-grid
+      // Height available for the picture grids:
+      // section height minus its padding, the title, and everything in the column that is not a grid
+      const style = getComputedStyle(favSection);
+      const h2 = favSection.querySelector('h2');
+      const h2Space = h2.offsetHeight + parseFloat(getComputedStyle(h2).marginBottom);
+      const sectionInner = favSection.clientHeight
+        - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+      const gridsNow = [...coverGrids].reduce((sum, g) => sum + g.offsetHeight, 0);
+      const chrome = favLeftCol.offsetHeight - gridsNow; // card titles and padding
+      const available = sectionInner - h2Space - chrome - 4;
 
-    function fitCoverGrid(grid) {
-      const total = Number(grid.dataset.count);
-      const max = Number(grid.dataset.max) || Infinity;
-      const width = Math.min(grid.clientWidth, max);
+      // Fewest columns (= largest tiles) whose rows still fit the available height
+      for (let cols = 3; cols <= 14; cols++) {
+        const tile = tileFor(width, cols);
+        const total = [...coverGrids].reduce(
+          (sum, g) => sum + gridHeight(countFor(g), cols, tile), 0
+        );
+        if (total <= available) return { cols, tile };
+      }
+      return { cols: 14, tile: tileFor(width, 14) };
+    }
+
+    function buildCovers() {
+      const width = sizeGrid.clientWidth;
       if (!width) return;
 
-      grid.style.maxWidth = max === Infinity ? '' : `${max}px`;
+      const { cols, tile } = calcLayout(width);
+      document.documentElement.style.setProperty('--tile-w', `${tile}px`);
 
-      const base = Number(grid.dataset.target) || DEFAULT_TARGET;
-      const target = Math.min(base, width / 5);
+      // Only rebuild the tiles when the number of columns changes
+      if (cols === lastCols) return;
+      lastCols = cols;
 
-      let best = 1;
-      let bestDiff = Infinity;
-      for (let cols = 1; cols <= total; cols++) {
-        if (total % cols !== 0) continue;
-        const tileWidth = (width - (cols - 1) * GAP) / cols;
-        const diff = Math.abs(tileWidth - target);
-        if (diff < bestDiff) {
-          bestDiff = diff;
-          best = cols;
+      coverGrids.forEach((grid) => {
+        const images = coverImages[grid.dataset.set] || [];
+        const count = Math.ceil(countFor(grid) / cols) * cols; // full rows: pad the last row
+
+        grid.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+          const tile = document.createElement('div');
+          tile.className = 'tile grow';
+          if (images[i]) tile.style.backgroundImage = `url("${images[i]}")`;
+          grid.appendChild(tile);
         }
-      }
-      grid.style.gridTemplateColumns = `repeat(${best}, minmax(0, 1fr))`;
+      });
     }
 
-    function fitAllCoverGrids() {
-      document.querySelectorAll('.cover-grid[data-count]').forEach(fitCoverGrid);
-    }
-
-    fitAllCoverGrids();
-    window.addEventListener('resize', fitAllCoverGrids);
+    buildCovers();
+    window.addEventListener('resize', buildCovers);
 
     // Current year, updates on its own
     document.getElementById('year').textContent = new Date().getFullYear();
