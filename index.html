@@ -12,7 +12,14 @@
     :root {
       --content-max: 1600px; /* how wide the content gets on big screens */
 
-         --hero-bg: "images/Banner1.png");  */
+      /* Hero banner: put your picture at images/Banner1.png (exact name, case-sensitive).
+         The dark layer on top keeps the text readable. Without the file, the purple color behind shows. */
+      --hero-bg: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45)), url("images/Banner1.png");
+
+      /* Glass look for cards and pills: slightly see-through and blurred,
+         so the liquid background shows faintly behind them. */
+      --card-glass: rgba(20, 17, 31, 0.5);
+      --card-blur: blur(14px) saturate(120%);
 
       --tile-w: 110px; /* width of all cover tiles, set by script */
     }
@@ -49,9 +56,9 @@
     .grow:hover { transform: scale(1.06); }
 
     /* ---------- Liquid background ----------
-       A fixed layer behind the whole page. Soft white blobs follow the mouse with a slight lag.
+       A fixed layer behind the whole page. Soft white blobs follow the mouse closely.
        The SVG filter "goo" melts neighboring blobs into one liquid shape.
-       The hero (banner) sits above this layer, so the liquid does not show there. */
+       The hero (banner) sits above this layer. Cards and pills are glass, so the liquid shows faintly through them. */
     .liquid {
       position: fixed;
       inset: 0;
@@ -300,7 +307,9 @@
       opacity: 0.9;
     }
 
-    /* Scroll reveal: elements fade and rise in when they come into view */
+    /* Scroll reveal: headings and the footer fade and rise in when they come into view.
+       Only use this on elements that do NOT contain glass cards: an opacity below 1 on a
+       wrapper stops the cards inside from blurring what is behind them (the glitch). */
     .reveal {
       opacity: 0;
       transform: translateY(24px);
@@ -394,7 +403,9 @@
       gap: 8px;
       padding: 7px 14px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.12);
+      background: var(--card-glass);
+      backdrop-filter: var(--card-blur);
+      -webkit-backdrop-filter: var(--card-blur);
       border: 1px solid rgba(255, 255, 255, 0.25);
       color: #fff;
       text-decoration: none;
@@ -405,7 +416,7 @@
     }
 
     .socials a:hover {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(40, 35, 58, 0.65);
       transform: translateY(-2px);
     }
 
@@ -442,12 +453,16 @@
       text-align: left;
     }
 
+    /* Cards are glass: slightly see-through and blurred, so the liquid shows faintly behind them */
     .fav-card {
       flex: 1 1 300px;
       max-width: 380px;
+      min-width: 0;
       padding: 20px 22px;
       border-radius: 20px;
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--card-glass);
+      backdrop-filter: var(--card-blur);
+      -webkit-backdrop-filter: var(--card-blur);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
@@ -485,6 +500,16 @@
     .col .fav-card {
       flex: none;
       max-width: none;
+    }
+
+    /* Right column on wide screens: a grid with three rows (Artists, Fictional Characters, Cars).
+       The script sets the row heights, so Fictional Characters ends at the bottom of Videogames
+       and Cars ends at the bottom of Movies. */
+    @media (min-width: 1100px) {
+      .col-right {
+        display: grid;
+        grid-template-rows: auto auto auto;
+      }
     }
 
     /* Artists in the narrower right column: slightly smaller pictures so all three fit in one row */
@@ -560,17 +585,17 @@
       justify-content: center;
       gap: 12px;
       width: 100%;
+      max-width: 100%;
+      min-width: 0;
       margin: 0 auto;
     }
 
     /* Cover tile: the outer tile sets the size and the perspective.
-       The 3D tilt only starts when the mouse is actually over the cover (see .tile.tilting).
-       A click opens the enlarged view (see the lightbox below). */
+       The tiles stay flat while hovering. A click opens the enlarged view, where the 3D tilt starts (see the lightbox below). */
     .tile {
       flex: 0 0 var(--tile-w);
       width: var(--tile-w);
       aspect-ratio: 2 / 3;
-      perspective: 900px;
       cursor: zoom-in;
       outline: none;
       -webkit-tap-highlight-color: transparent;
@@ -580,18 +605,12 @@
       position: relative;
       width: 100%;
       height: 100%;
-      transform-style: preserve-3d;
-      /* --rx / --ry: mouse tilt (only while hovering), --s: hover size */
-      transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(var(--s, 1));
-      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform: scale(var(--s, 1));
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    /* On hover: the cover grows a little and follows the mouse quickly */
+    /* On hover: the cover grows a little (no 3D) */
     .tile:hover .tile-inner { --s: 1.05; }
-
-    .tile.tilting .tile-inner {
-      transition: transform 0.15s ease-out;
-    }
 
     .tile:focus-visible .tile-inner {
       outline: 2px solid rgba(208, 188, 255, 0.8);
@@ -606,9 +625,9 @@
       overflow: hidden;
     }
 
-    /* The picture (or an empty dashed placeholder) with a soft light that follows the mouse */
+    /* The picture (or an empty dashed placeholder). Covers stay solid so the pictures look clean. */
     .face.front {
-      background-color: rgba(255, 255, 255, 0.06);
+      background-color: #231e33;
       background-size: cover;
       background-position: center;
       border: 1px dashed rgba(255, 255, 255, 0.3);
@@ -620,20 +639,9 @@
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
     }
 
-    .face.front::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.22), transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-
-    .tile:hover .face.front::after { opacity: 1; }
-
     /* ---------- Enlarged view (click on a cover) ----------
-       The whole page behind it is blurred. The cover grows from its tile to the middle of the screen. */
+       The whole page behind it is blurred. The cover grows from its tile to the middle of the screen.
+       Once it is enlarged, it tilts in 3D toward the mouse. */
     .lightbox {
       position: fixed;
       inset: 0;
@@ -642,6 +650,7 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
+      perspective: 1000px; /* gives the 3D tilt depth */
       background: rgba(12, 10, 20, 0.35);
       backdrop-filter: blur(14px) saturate(120%);
       -webkit-backdrop-filter: blur(14px) saturate(120%);
@@ -655,12 +664,19 @@
       pointer-events: auto;
     }
 
+    /* Tilt wrapper: rotates from the mouse position (--lrx, --lry), the card inside keeps its grow animation */
+    .lb-stage {
+      transform-style: preserve-3d;
+      transform: rotateX(var(--lrx, 0deg)) rotateY(var(--lry, 0deg));
+      transition: transform 0.25s ease-out;
+    }
+
     .lb-card {
       height: min(78vh, 117vw);
       max-width: 90vw;
       aspect-ratio: 2 / 3;
       border-radius: 16px;
-      background-color: rgba(255, 255, 255, 0.06);
+      background-color: #231e33;
       background-size: cover;
       background-position: center;
       border: 1px solid rgba(255, 255, 255, 0.25);
@@ -767,9 +783,10 @@
 
     .setup-spot {
       width: 100%;
+      min-width: 0;
       aspect-ratio: 16 / 9;
       border-radius: 20px;
-      background-color: rgba(255, 255, 255, 0.06);
+      background-color: #231e33; /* solid, so the picture looks clean */
       background-size: cover;
       background-position: center;
       border: 1px dashed rgba(255, 255, 255, 0.3);
@@ -791,6 +808,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      min-width: 0;
     }
 
     .setup-info .fav-card {
@@ -833,6 +851,14 @@
 
     .mod-group {
       min-width: 0;
+    }
+
+    /* Modding cards: more see-through than the other cards, so the color shapes behind show through.
+       Less blur too, so the shapes stay visible as soft color. */
+    .mod-layout .fav-card {
+      background: rgba(20, 17, 31, 0.25);
+      backdrop-filter: blur(8px) saturate(120%);
+      -webkit-backdrop-filter: blur(8px) saturate(120%);
     }
 
     /* Wide screens: the whole Modding section fits on one screen (height: 100vh).
@@ -991,7 +1017,7 @@
     </defs>
   </svg>
 
-  <!-- Liquid background: blobs follow the mouse, behind everything except the hero -->
+  <!-- Liquid background: blobs follow the mouse closely, behind everything except the hero -->
   <div class="liquid" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
 
   <header class="glass">
@@ -1103,7 +1129,9 @@
         </div>
       </div>
 
-      <div class="col">
+      <!-- Right column: the script aligns Fictional Characters to the bottom of Videogames
+           and Cars to the bottom of Movies (wide screens only) -->
+      <div class="col col-right">
         <div class="fav-card">
           <h3>Artists</h3>
           <div class="artist-row">
@@ -1396,19 +1424,9 @@
           <h3 class="sub mod-sub">PC Ports</h3>
           <div class="fav-grid">
             <div class="fav-card">
-              <h3><a href="https://sm64coopdx.com" target="_blank" rel="noopener">SM64 Coop Deluxe</a></h3>
-              <p>Online co-op mod for the Super Mario 64 PC port. You need your own ROM.</p>
+              <h3><a href="#" target="_blank" rel="noopener">Recomp Launcher</a></h3>
+              <p>Launcher for N64 PC ports made by recompiling the original games. You need your own ROM.</p>
               <p class="platforms">Platforms: Windows, Linux, macOS</p>
-            </div>
-            <div class="fav-card">
-              <h3><a href="https://flathub.org/apps/ca.parallel_launcher.ParallelLauncher" target="_blank" rel="noopener">Parallel Launcher</a></h3>
-              <p>Launcher for N64 games, both retail and homebrew.</p>
-              <p class="platforms">Platforms: Windows, Linux, macOS</p>
-            </div>
-            <div class="fav-card">
-              <h3><a href="#" target="_blank" rel="noopener">SpaghettiKart</a></h3>
-              <p>Unofficial native PC port of Mario Kart 64. You need your own US ROM.</p>
-              <p class="platforms">Platforms: Windows, macOS, Linux</p>
             </div>
           </div>
         </div>
@@ -1453,9 +1471,12 @@
     <p class="ai-note">AI was used for this website</p>
   </footer>
 
-  <!-- Enlarged view: opens when a cover is clicked. Click the blurred background or press Esc to close. -->
+  <!-- Enlarged view: opens when a cover is clicked. The cover tilts in 3D with the mouse.
+       Click the blurred background or press Esc to close. -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
-    <div class="lb-card" id="lb-card"></div>
+    <div class="lb-stage" id="lb-stage">
+      <div class="lb-card" id="lb-card"></div>
+    </div>
   </div>
 
   <script>
@@ -1463,32 +1484,100 @@
     // Add the path or URL of each picture to the list it belongs to.
     // The first entry goes to the first tile, the second to the second tile, and so on.
     // Empty tiles stay as dashed placeholders.
+    // Videogames: put the files in images/games/ and name them 01.jpg to 44.jpg in this order.
+    // Movies: put the posters in images/movies/ and name them 01.jpg to 08.jpg in this order.
+    // TV Shows: put the posters in images/tv/ and name them 01.jpg to 16.jpg in this order.
+    // The titles are only comments here, so they do not show on the page.
     const coverImages = {
       videogames: [
-        // "images/games/01.jpg",
-        // "images/games/02.jpg",
+        "images/games/01.jpg", // Red Dead Redemption 2
+        "images/games/02.jpg", // Cyberpunk 2077
+        "images/games/03.jpg", // Garry's Mod
+        "images/games/04.jpg", // Portal 2
+        "images/games/05.jpg", // Half-Life 2
+        "images/games/06.jpg", // Minecraft
+        "images/games/07.jpg", // Grand Theft Auto V
+        "images/games/08.jpg", // Gorilla Tag
+        "images/games/09.jpg", // Go Vacation
+        "images/games/10.jpg", // Super Mario Odyssey
+        "images/games/11.jpg", // Super Mario Galaxy
+        "images/games/12.jpg", // Super Mario 64
+        "images/games/13.jpg", // Super Mario Galaxy 2
+        "images/games/14.jpg", // Super Mario 3D World
+        "images/games/15.jpg", // EVADE
+        "images/games/16.jpg", // Roblox
+        "images/games/17.jpg", // Animal Crossing: New Horizons
+        "images/games/18.jpg", // Rayman Legends
+        "images/games/19.jpg", // Japanese Drift Master
+        "images/games/20.jpg", // BONELAB
+        "images/games/21.jpg", // FR Legends
+        "images/games/22.jpg", // LEGO City Undercover
+        "images/games/23.jpg", // Garry's Mod (second cover)
+        "images/games/24.jpg", // Escape the Backrooms
+        "images/games/25.jpg", // Counter-Strike 2
+        "images/games/26.jpg", // CarX Drift Racing Online
+        "images/games/27.jpg", // Splatoon 3
+        "images/games/28.jpg", // Minecraft: Story Mode (Season Two)
+        "images/games/29.jpg", // Minecraft: Story Mode (The Telltale Series)
+        "images/games/30.jpg", // Mario Kart Wii
+        "images/games/31.jpg", // Bendy and the Ink Machine
+        "images/games/32.jpg", // Haste: Broken Worlds
+        "images/games/33.jpg", // Far Cry 3
+        "images/games/34.jpg", // SUBLIMINAL
+        "images/games/35.jpg", // Mirror's Edge
+        "images/games/36.jpg", // Mouse: P.I. for Hire
+        "images/games/37.jpg", // BeamNG.drive
+        "images/games/38.jpg", // Forza Horizon 6
+        "images/games/39.jpg", // The Stanley Parable
+        "images/games/40.jpg", // Watch Dogs
+        "images/games/41.jpg", // Little Inferno
+        "images/games/42.jpg", // Sledding Game
+        "images/games/43.jpg", // Super Mario 3D Land
+        "images/games/44.jpg", // Super Mario Sunshine
       ],
       movies: [
-        // "images/movies/01.jpg",
+        "images/movies/01.jpg", // Scott Pilgrim vs. the World
+        "images/movies/02.jpg", // Free Guy
+        "images/movies/03.jpg", // Cars
+        "images/movies/04.jpg", // Deadpool
+        "images/movies/05.jpg", // Shaft (?)
+        "images/movies/06.jpg", // Ready Player One
+        "images/movies/07.jpg", // Cars (second poster)
+        "images/movies/08.jpg", // The Fast and the Furious: Tokyo Drift
       ],
       tvshows: [
-        // "images/tv/01.jpg",
+        "images/tv/01.jpg",  // Bluey
+        "images/tv/02.jpg",  // Murder Drones
+        "images/tv/03.jpg",  // The Owl House
+        "images/tv/04.jpg",  // Gravity Falls
+        "images/tv/05.jpg",  // Chainsaw Man (?)
+        "images/tv/06.jpg",  // SpongeBob SquarePants
+        "images/tv/07.jpg",  // The Amazing Digital Circus
+        "images/tv/08.jpg",  // Hazbin Hotel
+        "images/tv/09.jpg",  // Helluva Boss
+        "images/tv/10.jpg",  // Demon Slayer (?)
+        "images/tv/11.jpg",  // Anime poster, title to check
+        "images/tv/12.jpg",  // South Park
+        "images/tv/13.jpg",  // Solo Leveling (?)
+        "images/tv/14.jpg",  // Anime poster, title to check
+        "images/tv/15.jpg",  // Anime poster, title to check
+        "images/tv/16.jpg",  // Anime poster, title to check
       ],
     };
 
     // ---------- Cover tiles: one size, always full rows, fits the screen ----------
     // Narrow screens: the number of tiles per row comes from the width (about 3 to 8).
-    // Wide screens: the script picks the largest tiles that fit the height of the
-    // Favorites section, so the whole section is visible without scrolling.
+    // Wide screens: the script builds the grids with more and more columns (smaller tiles)
+    // until the left column really fits inside the Favorites section. The first layout
+    // that fits is kept, so nothing runs off the bottom of the screen.
     // Every grid gets the same tile size, and its tile count is raised to a multiple
     // of the number of columns, so the last row is always full.
-    const TILE_GAP = 12;   // must match the gap in .cover-grid
+    const TILE_GAP = 12;    // must match the gap in .cover-grid
     const TILE_RATIO = 1.5; // tile height = tile width * 1.5 (aspect ratio 2 / 3)
     const favSection = document.getElementById('favorites');
     const favLeftCol = favSection.querySelector('.fav-layout > .col');
     const sizeGrid = document.querySelector('.cover-grid[data-set="tvshows"]');
     const coverGrids = document.querySelectorAll('.cover-grid[data-count]');
-    let lastCols = 0;
 
     // Number of tiles a grid needs (at least data-count, at least one per image)
     function countFor(grid) {
@@ -1496,57 +1585,14 @@
       return Math.max(Number(grid.dataset.count), images.length);
     }
 
-    // Height of one grid with a given number of columns and tile width
-    function gridHeight(count, cols, tile) {
-      const rows = Math.ceil(count / cols);
-      return rows * tile * TILE_RATIO + (rows - 1) * TILE_GAP;
-    }
-
     // Tile width for a number of columns, so that the row fills the width exactly
     function tileFor(width, cols) {
       return (width - (cols - 1) * TILE_GAP - 1) / cols; // -1px keeps rounding safe
     }
 
-    function calcLayout(width) {
-      const isWide = window.matchMedia('(min-width: 1100px)').matches;
-
-      if (!isWide) {
-        const cols = Math.max(3, Math.min(8, Math.round(width / 115)));
-        return { cols, tile: tileFor(width, cols) };
-      }
-
-      // Height available for the picture grids:
-      // section height minus its padding, the title, and everything in the column that is not a grid
-      const style = getComputedStyle(favSection);
-      const h2 = favSection.querySelector('h2');
-      const h2Space = h2.offsetHeight + parseFloat(getComputedStyle(h2).marginBottom);
-      const sectionInner = favSection.clientHeight
-        - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
-      const gridsNow = [...coverGrids].reduce((sum, g) => sum + g.offsetHeight, 0);
-      const chrome = favLeftCol.offsetHeight - gridsNow; // card titles and padding
-      const available = sectionInner - h2Space - chrome - 4;
-
-      // Fewest columns (= largest tiles) whose rows still fit the available height
-      for (let cols = 3; cols <= 14; cols++) {
-        const tile = tileFor(width, cols);
-        const total = [...coverGrids].reduce(
-          (sum, g) => sum + gridHeight(countFor(g), cols, tile), 0
-        );
-        if (total <= available) return { cols, tile };
-      }
-      return { cols: 14, tile: tileFor(width, 14) };
-    }
-
-    function buildCovers() {
-      const width = sizeGrid.clientWidth;
-      if (!width) return;
-
-      const { cols, tile } = calcLayout(width);
+    // Builds every grid with the given number of columns and tile width
+    function buildGrids(cols, tile) {
       document.documentElement.style.setProperty('--tile-w', `${tile}px`);
-
-      // Only rebuild the tiles when the number of columns changes
-      if (cols === lastCols) return;
-      lastCols = cols;
 
       coverGrids.forEach((grid) => {
         const images = coverImages[grid.dataset.set] || [];
@@ -1568,9 +1614,80 @@
       });
     }
 
+    // Measured check: does the left column end inside the section (above its bottom padding)?
+    function leftColFits() {
+      const style = getComputedStyle(favSection);
+      const sectionRect = favSection.getBoundingClientRect();
+      const bottomLimit = sectionRect.top + favSection.clientHeight - parseFloat(style.paddingBottom);
+      return favLeftCol.getBoundingClientRect().bottom <= bottomLimit + 0.5;
+    }
+
+    function buildCovers() {
+      const width = sizeGrid.clientWidth;
+      if (!width) return;
+
+      const isWide = window.matchMedia('(min-width: 1100px)').matches;
+
+      if (!isWide) {
+        const cols = Math.max(3, Math.min(8, Math.round(width / 115)));
+        buildGrids(cols, tileFor(width, cols));
+        return;
+      }
+
+      // Largest tiles first: try 3 columns, then 4, and so on, measuring the real height each time
+      for (let cols = 3; cols <= 14; cols++) {
+        const tile = tileFor(width, cols);
+        buildGrids(cols, tile);
+        if (leftColFits()) return;
+      }
+      // Nothing fits even with the smallest tiles: keep the smallest layout
+      buildGrids(14, tileFor(width, 14));
+    }
+
+    // ---------- Right column alignment (wide screens) ----------
+    // Fictional Characters ends at the bottom of Videogames, and Cars ends at the bottom of Movies.
+    // The script measures the left cards and sets the three row heights of the right column.
+    // A card never gets shorter than its content, so no text is cut off.
+    const rightCol = document.querySelector('.col-right');
+    const leftCards = [...favLeftCol.children]; // Videogames, Movies, TV Shows
+
+    function alignRightCol() {
+      if (!window.matchMedia('(min-width: 1100px)').matches) {
+        rightCol.style.gridTemplateRows = ''; // narrow screens: normal stacking
+        return;
+      }
+
+      rightCol.style.gridTemplateRows = 'auto auto auto'; // measure the natural height of each card first
+      const gap = parseFloat(getComputedStyle(rightCol).rowGap) || 0;
+      const videogamesH = leftCards[0].offsetHeight;
+      const moviesH = leftCards[1].offsetHeight;
+      const [artists, fictional, cars] = [...rightCol.children];
+
+      const artistsH = artists.offsetHeight;
+      const fictionalNatural = fictional.offsetHeight;
+      const carsNatural = cars.offsetHeight;
+
+      // Target heights; if a card's content is taller, the card keeps its content height
+      const fictionalH = Math.max(videogamesH - artistsH - gap, fictionalNatural);
+      const carsH = Math.max(moviesH, carsNatural);
+
+      rightCol.style.gridTemplateRows = `${artistsH}px ${fictionalH}px ${carsH}px`;
+    }
+
+    function layoutFavorites() {
+      buildCovers();
+      alignRightCol();
+    }
+
+    layoutFavorites();
+    window.addEventListener('resize', layoutFavorites);
+    document.fonts.ready.then(layoutFavorites); // fonts change the card heights once loaded
+
     // ---------- Enlarged view ----------
     // The cover grows from its tile to the middle of the screen while the page behind it blurs.
+    // Once it is enlarged, it tilts in 3D toward the mouse.
     const lightbox = document.getElementById('lightbox');
+    const lbStage = document.getElementById('lb-stage');
     const lbCard = document.getElementById('lb-card');
     let lastTile = null;
 
@@ -1602,6 +1719,8 @@
       if (!lightbox.classList.contains('open')) return;
       lightbox.classList.remove('open');
       lightbox.setAttribute('aria-hidden', 'true');
+      lbStage.style.setProperty('--lrx', '0deg'); // start flat next time
+      lbStage.style.setProperty('--lry', '0deg');
       if (lastTile) lastTile.focus({ preventScroll: true });
     }
 
@@ -1609,49 +1728,29 @@
       if (e.target === lightbox) closeLightbox(); // click the blurred background to close
     });
 
+    // 3D tilt of the enlarged cover: follows the mouse, back to flat when the mouse leaves
+    lightbox.addEventListener('pointermove', (e) => {
+      if (!lightbox.classList.contains('open')) return;
+      const r = lbCard.getBoundingClientRect();
+      const x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);  // -1 (left) to 1 (right)
+      const y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2); // -1 (top) to 1 (bottom)
+      const cx = Math.max(-1, Math.min(1, x));
+      const cy = Math.max(-1, Math.min(1, y));
+      lbStage.style.setProperty('--lry', `${cx * 12}deg`);
+      lbStage.style.setProperty('--lrx', `${-cy * 12}deg`);
+    });
+
+    lightbox.addEventListener('pointerleave', () => {
+      lbStage.style.setProperty('--lry', '0deg');
+      lbStage.style.setProperty('--lrx', '0deg');
+    });
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeLightbox();
     });
 
-    // ---------- Cover tiles: 3D tilt only while the mouse is on a cover ----------
-    function startTilt(tile) {
-      tile.classList.add('tilting');
-    }
-
-    function moveTilt(tile, clientX, clientY) {
-      const r = tile.getBoundingClientRect();
-      const x = (clientX - r.left) / r.width;   // 0 (left) to 1 (right)
-      const y = (clientY - r.top) / r.height;   // 0 (top) to 1 (bottom)
-      const inner = tile.firstElementChild;
-      inner.style.setProperty('--ry', `${(x - 0.5) * 18}deg`);
-      inner.style.setProperty('--rx', `${(0.5 - y) * 18}deg`);
-      tile.style.setProperty('--mx', `${x * 100}%`);
-      tile.style.setProperty('--my', `${y * 100}%`);
-    }
-
-    function endTilt(tile) {
-      tile.classList.remove('tilting');
-      const inner = tile.firstElementChild;
-      inner.style.removeProperty('--rx');
-      inner.style.removeProperty('--ry');
-    }
-
+    // ---------- Cover tiles: click or Enter/Space opens the enlarged view ----------
     coverGrids.forEach((grid) => {
-      grid.addEventListener('pointerover', (e) => {
-        const tile = e.target.closest('.tile');
-        if (tile && !tile.contains(e.relatedTarget)) startTilt(tile);
-      });
-
-      grid.addEventListener('pointermove', (e) => {
-        const tile = e.target.closest('.tile');
-        if (tile) moveTilt(tile, e.clientX, e.clientY);
-      });
-
-      grid.addEventListener('pointerout', (e) => {
-        const tile = e.target.closest('.tile');
-        if (tile && !tile.contains(e.relatedTarget)) endTilt(tile);
-      });
-
       grid.addEventListener('click', (e) => {
         const tile = e.target.closest('.tile');
         if (tile) openLightbox(tile);
@@ -1665,19 +1764,16 @@
       });
     });
 
-    buildCovers();
-    window.addEventListener('resize', buildCovers);
-
     // ---------- Liquid background ----------
-    // The blobs follow the mouse with a small lag and wobble around it, so they feel liquid.
+    // The blobs follow the mouse closely, with a small lag and a tight wobble around the cursor.
     // Each blob has its own speed, distance and phase. Idle, they drift around the screen center.
     const liquidBlobs = [...document.querySelectorAll('.liquid span')];
     const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const liquidState = liquidBlobs.map((_, i) => ({
       x: pointer.x,
       y: pointer.y,
-      ease: 0.025 + i * 0.012,   // how quickly it catches up (smaller = more lag)
-      radius: 80 + i * 35,       // how far it wobbles around the cursor
+      ease: 0.04 + i * 0.015,    // how quickly it catches up (smaller = more lag)
+      radius: 12 + i * 10,       // how far it wobbles around the cursor (kept close)
       speed: 0.6 + i * 0.25,     // how fast it wobbles
       phase: i * 1.7,
     }));
@@ -1747,11 +1843,11 @@
     setInterval(updateClocks, 1000);
 
     // Scroll reveal.
-    // Sections: the trigger line sits slightly above the bottom edge, so big blocks
-    // (like the tall Favorites grid) do not wait until they are mostly visible.
+    // Only the section headings and the footer fade in. Cards are never faded, because
+    // an opacity below 1 on a wrapper stops the glass blur of the cards inside it.
+    // Sections: the trigger line sits slightly above the bottom edge.
     // Footer: no bottom margin, because the footer sits in the bottom area when the
     // page is scrolled to the end and would otherwise never trigger.
-    // The section notes and the decorative shapes stay as they are (no fade-in).
     function makeRevealObserver(rootMargin) {
       return new IntersectionObserver((entries, observer) => {
         entries.forEach((entry) => {
@@ -1763,16 +1859,16 @@
       }, { threshold: 0, rootMargin });
     }
 
-    const sectionTargets = document.querySelectorAll('section.content > *:not(.section-note):not(.blobs)');
+    const headingTargets = document.querySelectorAll('section.content > h2');
     const footerTargets = document.querySelectorAll('footer .clocks, footer .footer-name');
 
-    sectionTargets.forEach((el) => el.classList.add('reveal'));
-    footerTargets.forEach((el) => el.classList.add('reveal'));
+    headingTargets.forEach((el) => el.classList.add('reveal'));
+    footerTargets.forEach((el) => footerObserver.observe(el));
 
     const sectionObserver = makeRevealObserver('0px 0px -10% 0px');
     const footerObserver = makeRevealObserver('0px');
 
-    sectionTargets.forEach((el) => sectionObserver.observe(el));
+    headingTargets.forEach((el) => sectionObserver.observe(el));
     footerTargets.forEach((el) => footerObserver.observe(el));
   </script>
 </body>
