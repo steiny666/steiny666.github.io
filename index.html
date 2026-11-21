@@ -12,8 +12,8 @@
     :root {
       --content-max: 1600px; /* how wide the content gets on big screens */
 
-
-         --hero-bg: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45)), url("images/banner/Banner1.png");  
+      /* Hero background. Replace with your own image, e.g.:
+         --hero-bg: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45)), url("images/banner.jpg");  */
       --hero-bg: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
 
       --tile-w: 110px; /* width of all cover tiles, set by script */
@@ -43,12 +43,43 @@
       border: 1px solid rgba(255, 255, 255, 0.35);
     }
 
-    /* Hover growth shared by profile picture, artist pictures and cover tiles */
+    /* Hover growth for profile picture and artist pictures */
     .grow {
       transition: transform 0.3s ease;
     }
 
     .grow:hover { transform: scale(1.06); }
+
+    /* ---------- Liquid background ----------
+       A fixed layer behind the whole page. Soft white blobs follow the mouse with a slight lag.
+       The SVG filter "goo" melts neighboring blobs into one liquid shape.
+       The hero (banner) sits above this layer, so the liquid does not show there. */
+    .liquid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      filter: url(#goo);
+      opacity: 0.2;
+    }
+
+    .liquid span {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: clamp(60px, 7vw, 110px);
+      height: clamp(60px, 7vw, 110px);
+      border-radius: 50%;
+      will-change: transform;
+    }
+
+    /* Soft off-white tones: white, but not too bright */
+    .liquid span:nth-child(1) { background: #e9e4f2; }
+    .liquid span:nth-child(2) { background: #dcd6e8; }
+    .liquid span:nth-child(3) { background: #efeaf7; }
+    .liquid span:nth-child(4) { background: #d8d2e6; }
+    .liquid span:nth-child(5) { background: #e4dff0; }
 
     /* ---------- Header ---------- */
     header {
@@ -99,6 +130,7 @@
     /* ---------- Hero (home) ---------- */
     .hero {
       position: relative;
+      z-index: 2; /* above the liquid layer, so the banner stays clean */
       height: 100vh;
       min-height: 500px;
       display: flex;
@@ -166,7 +198,9 @@
     }
 
     /* ---------- Sections ---------- */
+    /* The background is transparent, so the liquid layer shows through. The body has the same color. */
     section.content {
+      position: relative; /* so the decorative shapes and the note in the corner sit inside the section */
       min-height: 100vh;
       padding: 100px 24px 80px;
       display: flex;
@@ -174,13 +208,19 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      background: #15121f;
+      background: transparent;
       scroll-snap-align: start;
     }
 
     section.content > * {
       width: 100%;
       max-width: var(--content-max);
+    }
+
+    /* Content sits above the decorative shapes */
+    section.content > *:not(.section-note):not(.blobs) {
+      position: relative;
+      z-index: 1;
     }
 
     section.content h2 {
@@ -196,6 +236,63 @@
       opacity: 0.85;
       max-width: 600px;
       margin: 0 auto;
+    }
+
+    /* Small note in the bottom right corner of a section */
+    section.content > .section-note {
+      position: absolute;
+      right: 24px;
+      bottom: 16px;
+      width: auto;
+      max-width: none;
+      margin: 0;
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+      text-align: right;
+      opacity: 0.5;
+      z-index: 1;
+    }
+
+    /* ---------- Material You shapes ----------
+       Four soft, blurred color shapes per section. The script gives each section its own
+       random positions, colors, sizes, strength and movement on every page load.
+       The shapes stay in the middle band of the section, so nothing gets cut at the
+       edges between two sections. */
+    section.content > .blobs {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      max-width: none; /* overrides the content width limit above */
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Base shape. Position, color and speed are set by the script (see below). */
+    .blobs span {
+      position: absolute;
+      border-radius: 50%;
+      width: 260px;
+      height: 260px;
+      transform: translate(-50%, -50%);
+      filter: blur(70px);
+      opacity: 0.25;
+      animation: float 20s ease-in-out infinite alternate;
+    }
+
+    /* Gentle drift: each shape moves by its own random amount (--dx, --dy) and breathes (--sc) */
+    @keyframes float {
+      from {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      to {
+        transform: translate(calc(-50% + var(--dx, 3vw)), calc(-50% + var(--dy, -2vh))) scale(var(--sc, 1.08));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .blobs span { animation: none; }
+      .liquid { display: none; }
     }
 
     .sub {
@@ -468,16 +565,118 @@
       margin: 0 auto;
     }
 
+    /* Cover tile: the outer tile sets the size and the perspective.
+       The 3D tilt only starts when the mouse is actually over the cover (see .tile.tilting).
+       A click opens the enlarged view (see the lightbox below). */
     .tile {
       flex: 0 0 var(--tile-w);
       width: var(--tile-w);
       aspect-ratio: 2 / 3;
+      perspective: 900px;
+      cursor: zoom-in;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tile-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      /* --rx / --ry: mouse tilt (only while hovering), --s: hover size */
+      transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(var(--s, 1));
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* On hover: the cover grows a little and follows the mouse quickly */
+    .tile:hover .tile-inner { --s: 1.05; }
+
+    .tile.tilting .tile-inner {
+      transition: transform 0.15s ease-out;
+    }
+
+    .tile:focus-visible .tile-inner {
+      outline: 2px solid rgba(208, 188, 255, 0.8);
+      outline-offset: 4px;
       border-radius: 10px;
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* The picture (or an empty dashed placeholder) with a soft light that follows the mouse */
+    .face.front {
       background-color: rgba(255, 255, 255, 0.06);
       background-size: cover;
       background-position: center;
       border: 1px dashed rgba(255, 255, 255, 0.3);
-      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0);
+      transition: box-shadow 0.4s ease;
+    }
+
+    .tile:hover .face.front {
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .face.front::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.22), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .tile:hover .face.front::after { opacity: 1; }
+
+    /* ---------- Enlarged view (click on a cover) ----------
+       The whole page behind it is blurred. The cover grows from its tile to the middle of the screen. */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(12, 10, 20, 0.35);
+      backdrop-filter: blur(14px) saturate(120%);
+      -webkit-backdrop-filter: blur(14px) saturate(120%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .lightbox.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lb-card {
+      height: min(78vh, 117vw);
+      max-width: 90vw;
+      aspect-ratio: 2 / 3;
+      border-radius: 16px;
+      background-color: rgba(255, 255, 255, 0.06);
+      background-size: cover;
+      background-position: center;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+      transform: scale(0.96);
+      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .lb-card.empty {
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+    }
+
+    .lightbox.open .lb-card {
+      transform: scale(1);
     }
 
     .artist-row {
@@ -512,7 +711,7 @@
     @media (min-width: 1100px) {
       .fav-section {
         height: 100vh;
-        padding: 88px 24px 24px;
+        padding: 88px 24px 40px;
       }
 
       .fav-section h2 {
@@ -620,6 +819,107 @@
       }
     }
 
+    /* ---------- Modding ---------- */
+    /* Small screens: one column, the groups stacked one after another */
+    .mod-layout {
+      display: block;
+    }
+
+    .mod-stack,
+    .mod-side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .mod-group {
+      min-width: 0;
+    }
+
+    /* Wide screens: the whole Modding section fits on one screen (height: 100vh).
+       Row 1: "Emulators" heading over the first three columns.
+       Row 2: four equal columns: Nintendo | PlayStation | Sega + Xbox | PC Ports + Mods.
+       The PC Ports column gets an extra gap on its left, so it is clearly separated.
+       Cards are compact so the tallest column fits. */
+    @media (min-width: 1100px) {
+      #modding {
+        height: 100vh;
+        padding: 88px 24px 40px;
+      }
+
+      #modding h2 {
+        font-size: clamp(2.4rem, 6vh, 4rem);
+        margin-bottom: 16px;
+      }
+
+      .mod-layout {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr)); /* four equal columns */
+        column-gap: 40px;                                 /* equal space between the emulator columns */
+        row-gap: 0;
+        align-items: start;
+        width: 100%;
+        text-align: left;
+      }
+
+      /* "Emulators" heading spans the first three columns in the first row */
+      .mod-layout > .mod-label {
+        grid-column: 1 / 4;
+        grid-row: 1;
+        margin: 0 0 4px;
+        font-size: 1.1rem;
+        text-align: left;
+      }
+
+      /* Everything else sits in the second row, so the headings line up */
+      .mod-layout > :not(.mod-label) {
+        grid-row: 2;
+      }
+
+      /* Right side: PC Ports and Mods, clearly separated from the emulators */
+      .mod-side {
+        grid-column: 4;
+        gap: 28px;
+        margin-left: 72px; /* extra space before the PC Ports column */
+      }
+
+      .mod-layout .mod-sub {
+        margin: 0 0 8px;
+        font-size: 1rem;
+        text-align: left;
+      }
+
+      .mod-layout .fav-grid {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 8px;
+        text-align: left;
+      }
+
+      .mod-layout .fav-card {
+        flex: none;
+        max-width: none;
+        width: 100%;
+        padding: 8px 12px;
+      }
+
+      .mod-layout .fav-card h3 {
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+      }
+
+      .mod-layout .fav-card p {
+        font-size: 0.78rem;
+        line-height: 1.3;
+      }
+
+      .mod-layout .platforms {
+        margin-top: 3px;
+        font-size: 0.7rem;
+      }
+    }
+
     /* ---------- Footer ---------- */
     footer {
       position: relative;
@@ -629,7 +929,7 @@
       align-items: center;
       gap: 24px;
       text-align: center;
-      background: #15121f;
+      background: transparent;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       scroll-snap-align: end;
     }
@@ -681,6 +981,21 @@
   </style>
 </head>
 <body>
+  <!-- Gooey filter: melts nearby liquid blobs into one shape.
+       stdDeviation is kept small so the blobs stay small and sharp-edged. -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="goo" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur"/>
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo"/>
+        <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Liquid background: blobs follow the mouse, behind everything except the hero -->
+  <div class="liquid" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+
   <header class="glass">
     <nav>
       <ul>
@@ -700,10 +1015,27 @@
   </section>
 
   <section class="content" id="about">
+    <!-- Decorative color shapes, randomized per page load by the script -->
+    <div class="blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
     <h2>About me</h2>
     <div class="profile">
       <div class="avatar grow">
         <svg viewBox="0 0 200 200" aria-hidden="true">
+          <defs>
+            <!-- Same scalloped outline as the spinning shape: the profile picture is clipped to it -->
+            <clipPath id="avatar-clip">
+              <circle cx="100" cy="100" r="66"/>
+              <circle cx="166" cy="100" r="26"/>
+              <circle cx="146.67" cy="146.67" r="26"/>
+              <circle cx="100" cy="166" r="26"/>
+              <circle cx="53.33" cy="146.67" r="26"/>
+              <circle cx="34" cy="100" r="26"/>
+              <circle cx="53.33" cy="53.33" r="26"/>
+              <circle cx="100" cy="34" r="26"/>
+              <circle cx="146.67" cy="53.33" r="26"/>
+            </clipPath>
+          </defs>
           <!-- Scalloped outer shape: center circle plus 8 bumps, turning slowly -->
           <g class="spin" fill="#d0bcff">
             <circle cx="100" cy="100" r="66"/>
@@ -716,9 +1048,11 @@
             <circle cx="100" cy="34" r="26"/>
             <circle cx="146.67" cy="53.33" r="26"/>
           </g>
-          <!-- Simple original figure (stays still) -->
+          <!-- Placeholder figure, hidden behind the picture once images/pfp.jpg exists -->
           <circle cx="100" cy="88" r="22" fill="#381e72"/>
           <path d="M55 150 C55 118 145 118 145 150 Z" fill="#381e72"/>
+          <!-- Your profile picture: put it at images/pfp.jpg. It stays still and is shown inside the scalloped shape -->
+          <image href="images/pfp.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatar-clip)"/>
         </svg>
       </div>
       <h3>Steiny</h3>
@@ -728,15 +1062,16 @@
       <!-- Order: social, videos and streams, music, code, then gaming and mods.
            Icons: Simple Icons (single-color logos) from the jsDelivr CDN, except Planet Minecraft
            and SteamGridDB, which use simple outline icons drawn here.
-           Discord and Pinterest still need their links (href="#" for now). -->
+           Discord still needs its link (href="#" for now). -->
       <div class="socials">
         <a href="https://www.instagram.com/steiny_666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/instagram.svg')"></span>Instagram</a>
         <a href="https://www.tiktok.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/tiktok.svg')"></span>TikTok</a>
         <a href="https://www.youtube.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/youtube.svg')"></span>YouTube</a>
         <a href="https://twitch.tv/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/twitch.svg')"></span>Twitch</a>
         <a href="#" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/discord.svg')"></span>Discord</a>
-        <a href="#" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/pinterest.svg')"></span>Pinterest</a>
+        <a href="https://de.pinterest.com/Steiny_666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/pinterest.svg')"></span>Pinterest</a>
         <a href="https://soundcloud.com/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/soundcloud.svg')"></span>SoundCloud</a>
+        <a href="https://www.last.fm/user/Steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/lastdotfm.svg')"></span>Last.fm</a>
         <a href="https://github.com/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/github.svg')"></span>GitHub</a>
         <a href="https://steamcommunity.com/id/steiny666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/steam.svg')"></span>Steam</a>
         <a href="https://www.steamgriddb.com/profile/76561199380229448" target="_blank" rel="noopener"><svg class="ico-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>SteamGridDB</a>
@@ -747,6 +1082,9 @@
   </section>
 
   <section class="content fav-section" id="favorites">
+    <!-- Decorative color shapes, randomized per page load by the script -->
+    <div class="blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
     <h2>Favorites</h2>
     <div class="fav-layout">
       <div class="col">
@@ -885,9 +1223,13 @@
         </div>
       </div>
     </div>
+    <p class="section-note">Not affiliated with any of these projects or brands.</p>
   </section>
 
   <section class="content" id="setup">
+    <!-- Decorative color shapes, randomized per page load by the script -->
+    <div class="blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
     <h2>Setup</h2>
 
     <div class="setup-layout">
@@ -933,123 +1275,165 @@
   </section>
 
   <section class="content" id="modding">
+    <!-- Decorative color shapes, randomized per page load by the script -->
+    <div class="blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
     <h2>Modding</h2>
 
-    <!-- Emulators, grouped by manufacturer: Nintendo first, then PlayStation, Sega, Xbox -->
-    <h3 class="sub" style="margin-top: 0;">Nintendo</h3>
-    <div class="fav-grid">
-      <div class="fav-card">
-        <h3><a href="https://dolphin-emu.org" target="_blank" rel="noopener">Dolphin</a></h3>
-        <p>Emulator for GameCube and Wii games.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+    <div class="mod-layout">
+      <h3 class="sub mod-label">Emulators</h3>
+
+      <!-- Column 1: Nintendo -->
+      <div class="mod-group">
+        <h3 class="sub mod-sub">Nintendo</h3>
+        <div class="fav-grid">
+          <div class="fav-card">
+            <h3><a href="https://dolphin-emu.org" target="_blank" rel="noopener">Dolphin</a></h3>
+            <p>Emulator for GameCube and Wii games.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://suyu.dev/" target="_blank" rel="noopener">Suyu</a></h3>
+            <p>Emulator for Nintendo Switch games, continuing the yuzu project.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://citra-emu.org" target="_blank" rel="noopener">Citra</a></h3>
+            <p>Emulator for Nintendo 3DS games. Development has stopped.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://cemu.info" target="_blank" rel="noopener">Cemu</a></h3>
+            <p>Emulator for Wii U games.</p>
+            <p class="platforms">Platforms: Windows, Linux</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://ares-emu.net" target="_blank" rel="noopener">ares</a></h3>
+            <p>Multi-system emulator for NES, SNES, Nintendo 64, Game Boy and Game Boy Advance.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://mgba.io" target="_blank" rel="noopener">mGBA</a></h3>
+            <p>Accurate emulator for Game Boy, Game Boy Color and Game Boy Advance.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://melonds.kuribo64.net" target="_blank" rel="noopener">melonDS</a></h3>
+            <p>Emulator for Nintendo DS games, with good compatibility and speed.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS</p>
+          </div>
+        </div>
       </div>
-      <div class="fav-card">
-        <h3><a href="https://suyu.dev/" target="_blank" rel="noopener">Suyu</a></h3>
-        <p>Emulator for Nintendo Switch games, continuing the yuzu project.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+
+      <!-- Column 2: PlayStation -->
+      <div class="mod-group">
+        <h3 class="sub mod-sub">PlayStation</h3>
+        <div class="fav-grid">
+          <div class="fav-card">
+            <h3><a href="https://github.com/stenzek/duckstation" target="_blank" rel="noopener">DuckStation</a></h3>
+            <p>Emulator for PlayStation 1 games, easy to set up.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://pcsx2.net" target="_blank" rel="noopener">PCSX2</a></h3>
+            <p>The best-known emulator for PlayStation 2 games.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://rpcs3.net" target="_blank" rel="noopener">RPCS3</a></h3>
+            <p>Emulator for PlayStation 3 games. Compatibility varies a lot from game to game.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://www.ppsspp.org" target="_blank" rel="noopener">PPSSPP</a></h3>
+            <p>Emulator for PlayStation Portable games, runs well on PC and phones.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS, Android, iOS</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://vita3k.org" target="_blank" rel="noopener">Vita3K</a></h3>
+            <p>Emulator for PlayStation Vita games, still in active development.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+          </div>
+        </div>
       </div>
-      <div class="fav-card">
-        <h3><a href="https://citra-emu.org" target="_blank" rel="noopener">Citra</a></h3>
-        <p>Emulator for Nintendo 3DS games. Development has stopped.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+
+      <!-- Column 3: Sega, then Xbox -->
+      <div class="mod-stack">
+        <div class="mod-group">
+          <h3 class="sub mod-sub">Sega</h3>
+          <div class="fav-grid">
+            <div class="fav-card">
+              <h3><a href="https://github.com/flyinghead/flycast" target="_blank" rel="noopener">Flycast</a></h3>
+              <p>Emulator for Sega Dreamcast games.</p>
+              <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+            </div>
+            <div class="fav-card">
+              <h3><a href="https://www.retroarch.com" target="_blank" rel="noopener">RetroArch</a></h3>
+              <p>Frontend with many cores, including Sega Saturn. Good for Saturn games.</p>
+              <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-group">
+          <h3 class="sub mod-sub">Xbox</h3>
+          <div class="fav-grid">
+            <div class="fav-card">
+              <h3><a href="https://xemu.app" target="_blank" rel="noopener">xemu</a></h3>
+              <p>Emulator for the original Xbox.</p>
+              <p class="platforms">Platforms: Windows, Linux, macOS</p>
+            </div>
+            <div class="fav-card">
+              <h3><a href="https://xenia.jp" target="_blank" rel="noopener">Xenia</a></h3>
+              <p>Emulator for Xbox 360 games. Compatibility is still growing.</p>
+              <p class="platforms">Platforms: Windows, Linux</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="fav-card">
-        <h3><a href="https://cemu.info" target="_blank" rel="noopener">Cemu</a></h3>
-        <p>Emulator for Wii U games.</p>
-        <p class="platforms">Platforms: Windows, Linux</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://ares-emu.net" target="_blank" rel="noopener">ares</a></h3>
-        <p>Multi-system emulator for NES, SNES, Nintendo 64, Game Boy and Game Boy Advance.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://mgba.io" target="_blank" rel="noopener">mGBA</a></h3>
-        <p>Accurate emulator for Game Boy, Game Boy Color and Game Boy Advance.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://melonds.kuribo64.net" target="_blank" rel="noopener">melonDS</a></h3>
-        <p>Emulator for Nintendo DS games, with good compatibility and speed.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS</p>
+
+      <!-- Column 4: PC Ports and Mods, starting at the same height as the emulator columns -->
+      <div class="mod-side">
+        <div class="mod-group">
+          <h3 class="sub mod-sub">PC Ports</h3>
+          <div class="fav-grid">
+            <div class="fav-card">
+              <h3><a href="https://sm64coopdx.com" target="_blank" rel="noopener">SM64 Coop Deluxe</a></h3>
+              <p>Online co-op mod for the Super Mario 64 PC port. You need your own ROM.</p>
+              <p class="platforms">Platforms: Windows, Linux, macOS</p>
+            </div>
+            <div class="fav-card">
+              <h3><a href="https://flathub.org/apps/ca.parallel_launcher.ParallelLauncher" target="_blank" rel="noopener">Parallel Launcher</a></h3>
+              <p>Launcher for N64 games, both retail and homebrew.</p>
+              <p class="platforms">Platforms: Windows, Linux, macOS</p>
+            </div>
+            <div class="fav-card">
+              <h3><a href="#" target="_blank" rel="noopener">SpaghettiKart</a></h3>
+              <p>Unofficial native PC port of Mario Kart 64. You need your own US ROM.</p>
+              <p class="platforms">Platforms: Windows, macOS, Linux</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mod-group">
+          <h3 class="sub mod-sub">Mods</h3>
+          <div class="fav-grid">
+            <div class="fav-card">
+              <h3><a href="https://github.com/HelloOO7/SMOO" target="_blank" rel="noopener">SMOO</a></h3>
+              <p>Online multiplayer mod for Super Mario Odyssey on Switch, to play with friends.</p>
+              <p class="platforms">Platform: Nintendo Switch</p>
+            </div>
+            <div class="fav-card">
+              <h3><a href="https://www.ctgpdx.com/" target="_blank" rel="noopener">CTGP Deluxe</a></h3>
+              <p>Mod for Mario Kart Wii with many extra custom tracks and online play.</p>
+              <p class="platforms">Platform: Wii / Dolphin</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <h3 class="sub">PlayStation</h3>
-    <div class="fav-grid">
-      <div class="fav-card">
-        <h3><a href="https://github.com/stenzek/duckstation" target="_blank" rel="noopener">DuckStation</a></h3>
-        <p>Emulator for PlayStation 1 games, easy to set up.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://pcsx2.net" target="_blank" rel="noopener">PCSX2</a></h3>
-        <p>The best-known emulator for PlayStation 2 games.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://rpcs3.net" target="_blank" rel="noopener">RPCS3</a></h3>
-        <p>Emulator for PlayStation 3 games. Compatibility varies a lot from game to game.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://www.ppsspp.org" target="_blank" rel="noopener">PPSSPP</a></h3>
-        <p>Emulator for PlayStation Portable games, runs well on PC and phones.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS, Android, iOS</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://vita3k.org" target="_blank" rel="noopener">Vita3K</a></h3>
-        <p>Emulator for PlayStation Vita games, still in active development.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
-      </div>
-    </div>
-
-    <h3 class="sub">Sega</h3>
-    <div class="fav-grid">
-      <div class="fav-card">
-        <h3><a href="https://github.com/flyinghead/flycast" target="_blank" rel="noopener">Flycast</a></h3>
-        <p>Emulator for Sega Dreamcast games.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://www.retroarch.com" target="_blank" rel="noopener">RetroArch</a></h3>
-        <p>Frontend with many cores, including Sega Saturn. Good for Saturn games.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
-      </div>
-    </div>
-
-    <h3 class="sub">Xbox</h3>
-    <div class="fav-grid">
-      <div class="fav-card">
-        <h3><a href="https://xemu.app" target="_blank" rel="noopener">xemu</a></h3>
-        <p>Emulator for the original Xbox.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://xenia.jp" target="_blank" rel="noopener">Xenia</a></h3>
-        <p>Emulator for Xbox 360 games. Compatibility is still growing.</p>
-        <p class="platforms">Platforms: Windows, Linux</p>
-      </div>
-    </div>
-
-    <h3 class="sub">PC Ports</h3>
-    <div class="fav-grid">
-      <div class="fav-card">
-        <h3><a href="https://sm64coopdx.com" target="_blank" rel="noopener">SM64 Coop Deluxe</a></h3>
-        <p>Online co-op mod for the Super Mario 64 PC port. You need your own ROM.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="https://flathub.org/apps/ca.parallel_launcher.ParallelLauncher" target="_blank" rel="noopener">Parallel Launcher</a></h3>
-        <p>Launcher for N64 games, both retail and homebrew.</p>
-        <p class="platforms">Platforms: Windows, Linux, macOS</p>
-      </div>
-      <div class="fav-card">
-        <h3><a href="#" target="_blank" rel="noopener">SpaghettiKart</a></h3>
-        <p>Unofficial native PC port of Mario Kart 64. You need your own US ROM.</p>
-        <p class="platforms">Platforms: Windows, macOS, Linux</p>
-      </div>
-    </div>
+    <p class="section-note">Not affiliated with any of these projects or brands.</p>
   </section>
 
   <footer>
@@ -1070,6 +1454,11 @@
     <p class="footer-name">Steiny <span id="year"></span></p>
     <p class="ai-note">AI was used for this website</p>
   </footer>
+
+  <!-- Enlarged view: opens when a cover is clicked. Click the blurred background or press Esc to close. -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lb-card" id="lb-card"></div>
+  </div>
 
   <script>
     // ---------- Your images ----------
@@ -1168,15 +1557,179 @@
         grid.innerHTML = '';
         for (let i = 0; i < count; i++) {
           const tile = document.createElement('div');
-          tile.className = 'tile grow';
-          if (images[i]) tile.style.backgroundImage = `url("${images[i]}")`;
+          tile.className = 'tile';
+          tile.tabIndex = 0;
+          tile.setAttribute('role', 'button');
+          tile.setAttribute('aria-label', 'Open enlarged cover');
+          tile.innerHTML = '<div class="tile-inner"><div class="face front"></div></div>';
+          if (images[i]) {
+            tile.querySelector('.front').style.backgroundImage = `url("${images[i]}")`;
+          }
           grid.appendChild(tile);
         }
       });
     }
 
+    // ---------- Enlarged view ----------
+    // The cover grows from its tile to the middle of the screen while the page behind it blurs.
+    const lightbox = document.getElementById('lightbox');
+    const lbCard = document.getElementById('lb-card');
+    let lastTile = null;
+
+    function openLightbox(tile) {
+      const front = tile.querySelector('.front');
+      const hasImage = Boolean(front.style.backgroundImage);
+      lbCard.style.backgroundImage = hasImage ? front.style.backgroundImage : '';
+      lbCard.classList.toggle('empty', !hasImage);
+
+      // Start the animation at the tile's position and size, then grow to the center
+      const r = tile.getBoundingClientRect();
+      const cardWidth = lbCard.offsetWidth;
+      const dx = r.left + r.width / 2 - window.innerWidth / 2;
+      const dy = r.top + r.height / 2 - window.innerHeight / 2;
+      const scale = r.width / cardWidth;
+
+      lbCard.style.transition = 'none';
+      lbCard.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+      lightbox.classList.add('open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      void lbCard.offsetWidth; // apply the start position before animating
+      lbCard.style.transition = '';
+      lbCard.style.transform = '';
+
+      lastTile = tile;
+    }
+
+    function closeLightbox() {
+      if (!lightbox.classList.contains('open')) return;
+      lightbox.classList.remove('open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      if (lastTile) lastTile.focus({ preventScroll: true });
+    }
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox(); // click the blurred background to close
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    // ---------- Cover tiles: 3D tilt only while the mouse is on a cover ----------
+    function startTilt(tile) {
+      tile.classList.add('tilting');
+    }
+
+    function moveTilt(tile, clientX, clientY) {
+      const r = tile.getBoundingClientRect();
+      const x = (clientX - r.left) / r.width;   // 0 (left) to 1 (right)
+      const y = (clientY - r.top) / r.height;   // 0 (top) to 1 (bottom)
+      const inner = tile.firstElementChild;
+      inner.style.setProperty('--ry', `${(x - 0.5) * 18}deg`);
+      inner.style.setProperty('--rx', `${(0.5 - y) * 18}deg`);
+      tile.style.setProperty('--mx', `${x * 100}%`);
+      tile.style.setProperty('--my', `${y * 100}%`);
+    }
+
+    function endTilt(tile) {
+      tile.classList.remove('tilting');
+      const inner = tile.firstElementChild;
+      inner.style.removeProperty('--rx');
+      inner.style.removeProperty('--ry');
+    }
+
+    coverGrids.forEach((grid) => {
+      grid.addEventListener('pointerover', (e) => {
+        const tile = e.target.closest('.tile');
+        if (tile && !tile.contains(e.relatedTarget)) startTilt(tile);
+      });
+
+      grid.addEventListener('pointermove', (e) => {
+        const tile = e.target.closest('.tile');
+        if (tile) moveTilt(tile, e.clientX, e.clientY);
+      });
+
+      grid.addEventListener('pointerout', (e) => {
+        const tile = e.target.closest('.tile');
+        if (tile && !tile.contains(e.relatedTarget)) endTilt(tile);
+      });
+
+      grid.addEventListener('click', (e) => {
+        const tile = e.target.closest('.tile');
+        if (tile) openLightbox(tile);
+      });
+
+      grid.addEventListener('keydown', (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('tile')) {
+          e.preventDefault();
+          openLightbox(e.target);
+        }
+      });
+    });
+
     buildCovers();
     window.addEventListener('resize', buildCovers);
+
+    // ---------- Liquid background ----------
+    // The blobs follow the mouse with a small lag and wobble around it, so they feel liquid.
+    // Each blob has its own speed, distance and phase. Idle, they drift around the screen center.
+    const liquidBlobs = [...document.querySelectorAll('.liquid span')];
+    const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const liquidState = liquidBlobs.map((_, i) => ({
+      x: pointer.x,
+      y: pointer.y,
+      ease: 0.025 + i * 0.012,   // how quickly it catches up (smaller = more lag)
+      radius: 80 + i * 35,       // how far it wobbles around the cursor
+      speed: 0.6 + i * 0.25,     // how fast it wobbles
+      phase: i * 1.7,
+    }));
+
+    window.addEventListener('pointermove', (e) => {
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
+    });
+
+    function animateLiquid(time) {
+      const t = time / 1000;
+      liquidBlobs.forEach((blob, i) => {
+        const s = liquidState[i];
+        const targetX = pointer.x + Math.cos(t * s.speed + s.phase) * s.radius;
+        const targetY = pointer.y + Math.sin(t * s.speed * 0.9 + s.phase) * s.radius * 0.8;
+        s.x += (targetX - s.x) * s.ease;
+        s.y += (targetY - s.y) * s.ease;
+        blob.style.transform = `translate(${s.x}px, ${s.y}px) translate(-50%, -50%)`;
+      });
+      requestAnimationFrame(animateLiquid);
+    }
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      requestAnimationFrame(animateLiquid);
+    }
+
+    // ---------- Random Material You shapes ----------
+    // Every section gets its own random set of shapes on each page load:
+    // position (inside the middle band, so nothing is cut at the section edges),
+    // color, size, blur, strength, and how far and fast it drifts.
+    const BLOB_COLORS = ['#d0bcff', '#b9f0c4', '#ffd6e7', '#a8c7fa', '#ffdcc2'];
+    const rand = (min, max) => min + Math.random() * (max - min);
+
+    document.querySelectorAll('.blobs').forEach((blobBox) => {
+      blobBox.querySelectorAll('span').forEach((blob) => {
+        const size = rand(14, 26); // in vw
+        blob.style.width = `clamp(140px, ${size}vw, 360px)`;
+        blob.style.height = blob.style.width;
+        blob.style.left = `${rand(-4, 104)}%`;
+        blob.style.top = `${rand(28, 72)}%`;
+        blob.style.background = BLOB_COLORS[Math.floor(Math.random() * BLOB_COLORS.length)];
+        blob.style.opacity = rand(0.18, 0.32).toFixed(2);
+        blob.style.filter = `blur(${Math.round(rand(55, 90))}px)`;
+        blob.style.setProperty('--dx', `${rand(-5, 5).toFixed(1)}vw`);
+        blob.style.setProperty('--dy', `${rand(-3, 3).toFixed(1)}vh`);
+        blob.style.setProperty('--sc', rand(0.95, 1.15).toFixed(2));
+        blob.style.animationDuration = `${rand(14, 28).toFixed(1)}s`;
+        blob.style.animationDelay = `${rand(-20, 0).toFixed(1)}s`;
+      });
+    });
 
     // Current year, updates on its own
     document.getElementById('year').textContent = new Date().getFullYear();
@@ -1200,6 +1753,7 @@
     // (like the tall Favorites grid) do not wait until they are mostly visible.
     // Footer: no bottom margin, because the footer sits in the bottom area when the
     // page is scrolled to the end and would otherwise never trigger.
+    // The section notes and the decorative shapes stay as they are (no fade-in).
     function makeRevealObserver(rootMargin) {
       return new IntersectionObserver((entries, observer) => {
         entries.forEach((entry) => {
@@ -1211,7 +1765,7 @@
       }, { threshold: 0, rootMargin });
     }
 
-    const sectionTargets = document.querySelectorAll('section.content > *');
+    const sectionTargets = document.querySelectorAll('section.content > *:not(.section-note):not(.blobs)');
     const footerTargets = document.querySelectorAll('footer .clocks, footer .footer-name');
 
     sectionTargets.forEach((el) => el.classList.add('reveal'));
