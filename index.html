@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Steiny</title>
+  <!-- Favicon: put your icon at images/favicon.png -->
+  <link rel="icon" href="images/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="images/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@300;400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
@@ -1047,35 +1050,31 @@
       <div class="avatar grow">
         <svg viewBox="0 0 200 200" aria-hidden="true">
           <defs>
-            <!-- Same scalloped outline as the spinning shape: the profile picture is clipped to it -->
+            <!-- Picture area: Filow's flower shape, scaled to 86% so the picture sits inside the ring -->
             <clipPath id="avatar-clip">
-              <circle cx="100" cy="100" r="66"/>
-              <circle cx="166" cy="100" r="26"/>
-              <circle cx="146.67" cy="146.67" r="26"/>
-              <circle cx="100" cy="166" r="26"/>
-              <circle cx="53.33" cy="146.67" r="26"/>
-              <circle cx="34" cy="100" r="26"/>
-              <circle cx="53.33" cy="53.33" r="26"/>
-              <circle cx="100" cy="34" r="26"/>
-              <circle cx="146.67" cy="53.33" r="26"/>
+              <circle cx="100" cy="100" r="43"/>
+              <circle cx="143" cy="100" r="41.3"/>
+              <circle cx="121.5" cy="137.2" r="41.3"/>
+              <circle cx="78.5" cy="137.2" r="41.3"/>
+              <circle cx="57" cy="100" r="41.3"/>
+              <circle cx="78.5" cy="62.8" r="41.3"/>
+              <circle cx="121.5" cy="62.8" r="41.3"/>
             </clipPath>
           </defs>
-          <!-- Scalloped outer shape: center circle plus 8 bumps, turning slowly -->
+          <!-- Colored ring: Filow's flower shape, turning slowly behind the picture -->
           <g class="spin" fill="#d0bcff">
-            <circle cx="100" cy="100" r="66"/>
-            <circle cx="166" cy="100" r="26"/>
-            <circle cx="146.67" cy="146.67" r="26"/>
-            <circle cx="100" cy="166" r="26"/>
-            <circle cx="53.33" cy="146.67" r="26"/>
-            <circle cx="34" cy="100" r="26"/>
-            <circle cx="53.33" cy="53.33" r="26"/>
-            <circle cx="100" cy="34" r="26"/>
-            <circle cx="146.67" cy="53.33" r="26"/>
+            <circle cx="100" cy="100" r="50"/>
+            <circle cx="150" cy="100" r="48"/>
+            <circle cx="125" cy="143.3" r="48"/>
+            <circle cx="75" cy="143.3" r="48"/>
+            <circle cx="50" cy="100" r="48"/>
+            <circle cx="75" cy="56.7" r="48"/>
+            <circle cx="125" cy="56.7" r="48"/>
           </g>
-          <!-- Placeholder figure, hidden behind the picture once images/pfp.jpg exists -->
+          <!-- Placeholder figure, hidden behind the picture once images/pfp.png exists -->
           <circle cx="100" cy="88" r="22" fill="#381e72"/>
           <path d="M55 150 C55 118 145 118 145 150 Z" fill="#381e72"/>
-          <!-- Your profile picture: put it at images/pfp.png. It stays still and is shown inside the scalloped shape -->
+          <!-- Your profile picture: put it at images/pfp.png. It stays still inside the inner shape -->
           <image href="images/pfp.png" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatar-clip)"/>
         </svg>
       </div>
@@ -1259,8 +1258,8 @@
     <h2>Setup</h2>
 
     <div class="setup-layout">
-      <!-- Put your setup picture path in url('...') -->
-      <div class="setup-spot" style="background-image: url('images/setup.jpg');"></div>
+      <!-- Your setup picture: set SETUP_IMAGE at the top of the script -->
+      <div class="setup-spot" id="setup-spot"></div>
 
       <div class="setup-info">
         <div class="fav-card">
@@ -1481,90 +1480,114 @@
 
   <script>
     // ---------- Your images ----------
+    // Setup picture: put the file at images/setup.jpg, or change the path here.
+    const SETUP_IMAGE = "images/setup.jpg";
+
     // Add the path or URL of each picture to the list it belongs to.
     // The first entry goes to the first tile, the second to the second tile, and so on.
     // Empty tiles stay as dashed placeholders.
-    // Videogames: put the files in images/games/ and name them 01.jpg to 44.jpg in this order.
-    // Movies: put the posters in images/movies/ and name them 01.jpg to 08.jpg in this order.
-    // TV Shows: put the posters in images/tv/ and name them 01.jpg to 16.jpg in this order.
+    // Videogames: sorted by company, and within a company by game category.
+    // Movies: sorted by category.
+    // TV Shows: sorted by category.
     // The titles are only comments here, so they do not show on the page.
     const coverImages = {
       videogames: [
-       "images/games/10.png", // Super Mario Odyssey — Nintendo
-       "images/games/11.png", // Super Mario Galaxy — Nintendo
-       "images/games/12.png", // Super Mario Galaxy 2 — Nintendo
-       "images/games/13.png", // Super Mario 64 — Nintendo
-       "images/games/14.png", // Super Mario 3D World — Nintendo
-       "images/games/43.png", // Super Mario 3D Land — Nintendo
-       "images/games/44.png", // Super Mario Sunshine — Nintendo
-       "images/games/17.png", // Animal Crossing: New Horizons — Nintendo
-       "images/games/27.png", // Splatoon 3 — Nintendo
-       "images/games/30.png", // Mario Kart Wii — Nintendo
-       "images/games/01.png", // Red Dead Redemption 2 — Rockstar Games
-       "images/games/07.png", // Grand Theft Auto V — Rockstar Games
-       "images/games/46.png", // Portal — Valve
-       "images/games/04.png", // Portal 2 — Valve
-       "images/games/05.png", // Half-Life 2 — Valve
-       "images/games/47.png", // Counter Strike: Source — Valve
-       "images/games/25.png", // Counter-Strike 2 — Valve
-       "images/games/18.png", // Rayman Legends — Ubisoft
-       "images/games/33.png", // Far Cry 3 — Ubisoft
-       "images/games/40.png", // Watch Dogs — Ubisoft
-       "images/games/06.png", // Minecraft — Mojang (Microsoft)
-       "images/games/45.png", // Minecraft: Wii U Edition — Mojang / 4J Studios
-       "images/games/29.png", // Minecraft: Story Mode (The Telltale Series) — Telltale Games
-       "images/games/28.png", // Minecraft: Story Mode (Season Two) — Telltale Games
-       "images/games/48.png", // Forza Horizon 2 — Turn10
-       "images/games/38.png", // Forza Horizon 6 — Playground Games / Xbox Game Studios
-       "images/games/03.png", // Garry's Mod — Facepunch Studios
-       "images/games/16.png", // Roblox — Roblox Corporation
-       "images/games/15.png", // EVADE — Roblox-Erlebnis
-       "images/games/09.png", // Go Vacation — Bandai Namco
-       "images/games/49.png", // Need for Speed Underground 2 — Electronic Arts
-       "images/games/35.png", // Mirror's Edge — DICE / Electronic Arts
-       "images/games/22.png", // LEGO City Undercover — TT Fusion / Warner Bros. Games
-       "images/games/08.png", // Gorilla Tag — Another Axiom
-       "images/games/20.png", // BONELAB — Stress Level Zero
-       "images/games/24.png", // Escape the Backrooms — Fancy Games
-       "images/games/26.png", // CarX Drift Racing Online — CarX Technologies
-       "images/games/31.png", // Bendy and the Ink Machine — Joey Drew Studios
-       "images/games/32.png", // Haste: Broken Worlds — Landfall
-       "images/games/36.png", // Mouse: P.I. for Hire — Fumi Games
-       "images/games/37.png", // BeamNG.drive — BeamNG GmbH
-       "images/games/39.png", // The Stanley Parable — Galactic Café / Crows Crows Crows
-       "images/games/41.png", // Little Inferno — Tomorrow Corporation
-       "images/games/21.png", // FR Legends — Entwickler unklar
-       "images/games/19.png", // Japanese Drift Master — Entwickler unklar
-       "images/games/34.png", // SUBLIMINAL — Entwickler unklar
-       "images/games/42.png", // Sledding Game — Entwickler unklar
+        // Nintendo: Mario games, then other Nintendo games
+        "images/games/10.png", // Super Mario Odyssey — Nintendo
+        "images/games/11.png", // Super Mario Galaxy — Nintendo
+        "images/games/12.png", // Super Mario Galaxy 2 — Nintendo
+        "images/games/13.png", // Super Mario 64 — Nintendo
+        "images/games/14.png", // Super Mario 3D World — Nintendo
+        "images/games/43.png", // Super Mario 3D Land — Nintendo
+        "images/games/44.png", // Super Mario Sunshine — Nintendo
+        "images/games/17.png", // Animal Crossing: New Horizons — Nintendo
+        "images/games/27.png", // Splatoon 3 — Nintendo
+        "images/games/30.png", // Mario Kart Wii — Nintendo
+        // Rockstar Games
+        "images/games/01.png", // Red Dead Redemption 2 — Rockstar Games
+        "images/games/07.png", // Grand Theft Auto V — Rockstar Games
+        // Valve
+        "images/games/46.png", // Portal — Valve
+        "images/games/04.png", // Portal 2 — Valve
+        "images/games/05.png", // Half-Life 2 — Valve
+        "images/games/47.png", // Counter Strike: Source — Valve
+        "images/games/25.png", // Counter-Strike 2 — Valve
+        // Ubisoft
+        "images/games/18.png", // Rayman Legends — Ubisoft
+        "images/games/33.png", // Far Cry 3 — Ubisoft
+        "images/games/40.png", // Watch Dogs — Ubisoft
+        // Mojang (Microsoft)
+        "images/games/06.png", // Minecraft — Mojang (Microsoft)
+        "images/games/45.png", // Minecraft: Wii U Edition — Mojang / 4J Studios
+        // Telltale Games
+        "images/games/29.png", // Minecraft: Story Mode (The Telltale Series) — Telltale Games
+        "images/games/28.png", // Minecraft: Story Mode (Season Two) — Telltale Games
+        // Turn 10 / Playground Games (Xbox Game Studios)
+        "images/games/48.png", // Forza Horizon 2 — Turn10
+        "images/games/38.png", // Forza Horizon 6 — Playground Games / Xbox Game Studios
+        // Roblox
+        "images/games/16.png", // Roblox — Roblox Corporation
+        "images/games/15.png", // EVADE — Roblox-Erlebnis
+        // Bandai Namco
+        "images/games/09.png", // Go Vacation — Bandai Namco
+        // Electronic Arts
+        "images/games/49.png", // Need for Speed Underground 2 — Electronic Arts
+        "images/games/35.png", // Mirror's Edge — DICE / Electronic Arts
+        // Warner Bros. Games
+        "images/games/22.png", // LEGO City Undercover — TT Fusion / Warner Bros. Games
+        // Independent studios
+        "images/games/03.png", // Garry's Mod — Facepunch Studios
+        "images/games/08.png", // Gorilla Tag — Another Axiom
+        "images/games/20.png", // BONELAB — Stress Level Zero
+        "images/games/24.png", // Escape the Backrooms — Fancy Games
+        "images/games/26.png", // CarX Drift Racing Online — CarX Technologies
+        "images/games/31.png", // Bendy and the Ink Machine — Joey Drew Studios
+        "images/games/32.png", // Haste: Broken Worlds — Landfall
+        "images/games/36.png", // Mouse: P.I. for Hire — Fumi Games
+        "images/games/37.png", // BeamNG.drive — BeamNG GmbH
+        "images/games/39.png", // The Stanley Parable — Galactic Café / Crows Crows Crows
+        "images/games/41.png", // Little Inferno — Tomorrow Corporation
+        // Unknown developer
+        "images/games/21.png", // FR Legends — Entwickler unklar
+        "images/games/19.png", // Japanese Drift Master — Entwickler unklar
+        "images/games/34.png", // SUBLIMINAL — Entwickler unklar
+        "images/games/42.png", // Sledding Game — Entwickler unklar
       ],
       movies: [
-        "images/movies/01.png", // Scott Pilgrim vs. the World
-        "images/movies/02.png", // Deadpool
+        // Animation
         "images/movies/03.png", // Cars
         "images/movies/04.png", // Cars 2
-        "images/movies/05.png", // Ready Player One
-        "images/movies/06.png", // Free Guy
+        // Action
+        "images/movies/02.png", // Deadpool
         "images/movies/07.png", // The Fast and the Furious: Tokyo Drift
+        // Comedy and action
+        "images/movies/01.png", // Scott Pilgrim vs. the World
+        "images/movies/06.png", // Free Guy
+        // Sci-fi
+        "images/movies/05.png", // Ready Player One
+        // Crime and drama
+        "images/movies/10.png", // Pulp Fiction
         "images/movies/08.png", // Fight Club
         "images/movies/09.png", // Fear and Loathing in Las Vegas
-        "images/movies/10.png", // Pulp Fiction
       ],
       tvshows: [
+        // Cartoons for kids and family
         "images/tv/01.png",  // Bluey
-        "images/tv/02.png",  // Murder Drones
-        "images/tv/03.png",  // The Owl House
         "images/tv/04.png",  // Gravity Falls
+        "images/tv/03.png",  // The Owl House
         "images/tv/06.png",  // SpongeBob SquarePants
         "images/tv/07.png",  // The Amazing Digital Circus
+        "images/tv/02.png",  // Murder Drones
+        // Adult animation
         "images/tv/08.png",  // Hazbin Hotel
         "images/tv/09.png",  // Helluva Boss
-        "images/tv/11.png",  // Scott Pilgrim
         "images/tv/12.png",  // South Park
-        "images/tv/05.png",  // Assissination Classroom
+        // Anime
+        "images/tv/05.png",  // Assassination Classroom
+        "images/tv/10.png",  // Demon Slayer
+        "images/tv/11.png",  // Scott Pilgrim
         "images/tv/13.png",  // Sakamoto Days
         "images/tv/14.png",  // Chainsmoker Cat
-        "images/tv/10.png",  // Demon Slayer
       ],
     };
 
@@ -1685,6 +1708,9 @@
     layoutFavorites();
     window.addEventListener('resize', layoutFavorites);
     document.fonts.ready.then(layoutFavorites); // fonts change the card heights once loaded
+
+    // ---------- Setup picture ----------
+    document.getElementById('setup-spot').style.backgroundImage = `url("${SETUP_IMAGE}")`;
 
     // ---------- Enlarged view ----------
     // The cover grows from its tile to the middle of the screen while the page behind it blurs.
@@ -1866,8 +1892,8 @@
     const footerTargets = document.querySelectorAll('footer .clocks, footer .footer-name');
 
     headingTargets.forEach((el) => el.classList.add('reveal'));
-    footerTargets.forEach((el) => footerObserver.observe(el));
 
+    // Observers are created before they are used
     const sectionObserver = makeRevealObserver('0px 0px -10% 0px');
     const footerObserver = makeRevealObserver('0px');
 
