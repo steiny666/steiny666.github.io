@@ -41,6 +41,17 @@
       overflow-x: hidden;
     }
 
+    /* Selected text: Material You primary color with dark text, so it stays readable */
+    ::selection {
+      background: #d0bcff;
+      color: #15121f;
+    }
+
+    ::-moz-selection {
+      background: #d0bcff;
+      color: #15121f;
+    }
+
     p { line-height: 1.5; }
 
     /* Glass effect for the header */
@@ -508,8 +519,8 @@
     }
 
     /* Two-column favorites layout.
-       Narrow screens: one column (Videogames, Movies, TV Shows, then Artists, Fictional Characters, Cars).
-       Wide screens: left column = picture grids (flexible), right column = Artists, Fictional Characters, Cars (fixed 420px). */
+       Narrow screens: one column (Videogames, Movies, TV Shows, then Artists, Fictional Characters, Cars, Gaming brands, Colors).
+       Wide screens: left column = picture grids (flexible), right column = Artists, Fictional Characters, Cars + Gaming brands side by side, Colors (fixed 420px). */
     .fav-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -537,13 +548,14 @@
       max-width: none;
     }
 
-    /* Right column on wide screens: a grid with three rows (Artists, Fictional Characters, Cars).
-       The script sets the row heights, so Fictional Characters ends at the bottom of Videogames
-       and Cars ends at the bottom of Movies. */
+    /* Right column on wide screens: a grid with four rows
+       (Artists, Fictional Characters, Cars + Gaming brands, Colors).
+       The script sets the row heights, so Fictional Characters ends at the bottom of Videogames,
+       the Cars + Gaming brands row ends at the bottom of Movies and Colors ends at the bottom of TV Shows. */
     @media (min-width: 1100px) {
       .col-right {
         display: grid;
-        grid-template-rows: auto auto auto;
+        grid-template-rows: auto auto auto auto;
       }
     }
 
@@ -609,6 +621,65 @@
       margin-top: 10px;
       font-size: 0.8rem;
       opacity: 0.6;
+    }
+
+    /* ---------- Cars and Gaming brands (side by side) ----------
+       Two separate boxes in one row: Cars on the left, Gaming brands on the right.
+       Both boxes share the row height, so the column width does not change. */
+    .cars-brands {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .cars-brands .fav-card {
+      flex: none;
+      max-width: none;
+      min-width: 0;
+    }
+
+    /* ---------- Colors card (Material shapes) ----------
+       Eight colors, sorted from dark to light. Each color has its own Material shape (see the
+       shape definitions in the body). */
+    .colors-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Four swatches per row, so the eight colors make two even rows */
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(4, 60px);
+      justify-content: center;
+      gap: 12px 18px;
+    }
+
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* The shape is drawn in the color set by --c (fill and outline both use currentColor) */
+    .swatch-shape {
+      display: block;
+      width: 52px;
+      height: 52px;
+      color: var(--c);
+      fill: currentColor;
+      overflow: visible;
+      filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.45)); /* keeps the very dark shapes visible */
+    }
+
+    .hex {
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      opacity: 0.8;
+      font-variant-numeric: tabular-nums;
     }
 
     /* ---------- Favorites: pictures ---------- */
@@ -780,6 +851,8 @@
 
       .fav-section .col { gap: 12px; }
 
+      .fav-section .cars-brands { gap: 12px; }
+
       .fav-section .fav-card { padding: 14px 18px; }
 
       .fav-section .fav-card h3 {
@@ -803,6 +876,8 @@
       .fav-section .artist { gap: 6px; }
 
       .fav-section .artist-name { font-size: 0.85rem; }
+
+      .fav-section .swatches { gap: 10px 18px; }
     }
 
     /* ---------- Setup ---------- */
@@ -911,7 +986,7 @@
     }
 
     /* Wide screens: the whole Modding section fits on one screen (height: 100vh).
-       Row 1: "Emulators" heading over the first three columns.
+       Row 1: "Emulators" heading, centered over the three emulator columns (above PlayStation).
        Row 2: four equal columns: Nintendo | PlayStation | Sega + Xbox | PC Ports + Mods.
        The PC Ports column gets an extra gap on its left, so it is clearly separated.
        Cards are compact so the tallest column fits. */
@@ -936,13 +1011,14 @@
         text-align: left;
       }
 
-      /* "Emulators" heading spans the first three columns in the first row */
+      /* "Emulators" heading spans the first three columns in the first row, centered over them */
       .mod-layout > .mod-label {
         grid-column: 1 / 4;
         grid-row: 1;
         margin: 0 0 4px;
         font-size: 1.1rem;
-        text-align: left;
+        font-weight: 700;
+        text-align: center;
       }
 
       /* Everything else sits in the second row, so the headings line up */
@@ -957,16 +1033,18 @@
         margin-left: 72px; /* extra space before the PC Ports column */
       }
 
+      /* Column headings: bolder than the card titles, so they stay easy to tell apart */
       .mod-layout .mod-sub {
         margin: 0 0 8px;
         font-size: 1rem;
+        font-weight: 700;
         text-align: left;
       }
 
       .mod-layout .fav-grid {
         flex-direction: column;
         flex-wrap: nowrap;
-        gap: 8px;
+        gap: 6px;
         text-align: left;
       }
 
@@ -974,11 +1052,12 @@
         flex: none;
         max-width: none;
         width: 100%;
-        padding: 8px 12px;
+        padding: 6px 10px;
       }
 
       .mod-layout .fav-card h3 {
         font-size: 0.95rem;
+        font-weight: 500;
         margin-bottom: 2px;
       }
 
@@ -988,7 +1067,7 @@
       }
 
       .mod-layout .platforms {
-        margin-top: 3px;
+        margin-top: 2px;
         font-size: 0.7rem;
       }
     }
@@ -1063,6 +1142,48 @@
         <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo"/>
         <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
       </filter>
+    </defs>
+  </svg>
+
+  <!-- Material shapes for the color swatches (drawn once here, reused with <use>).
+       Each shape uses currentColor for its fill and outline, so the color comes from the swatch.
+       Triangle, diamond and hexagon use a thick round outline, which makes their corners more rounded. -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <!-- Rounded triangle -->
+      <symbol id="shape-triangle" viewBox="0 0 100 100">
+        <polygon points="50,22 80,78 20,78" stroke="currentColor" stroke-width="26" stroke-linejoin="round"/>
+      </symbol>
+      <!-- Rounded diamond -->
+      <symbol id="shape-diamond" viewBox="0 0 100 100">
+        <polygon points="50,20 80,50 50,80 20,50" stroke="currentColor" stroke-width="26" stroke-linejoin="round"/>
+      </symbol>
+      <!-- Heart, same shape as the reference: full rounded lobes and a pointed bottom -->
+      <symbol id="shape-heart" viewBox="0 0 100 100">
+        <path d="M50 86 C50 86 12 62 12 36 C12 22 22 12 34 12 C42 12 48 17 50 24 C52 17 58 12 66 12 C78 12 88 22 88 36 C88 62 50 86 50 86 Z" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/>
+      </symbol>
+      <!-- Ghost shape: rounder top, wavy bottom with three bumps -->
+      <symbol id="shape-arch" viewBox="0 0 100 100">
+        <path d="M14 86 V46 C14 26 30 12 50 12 C70 12 86 26 86 46 V86 Q76 76 67 86 Q58 76 50 86 Q42 76 33 86 Q24 76 14 86 Z" stroke="currentColor" stroke-width="8" stroke-linejoin="round"/>
+      </symbol>
+      <!-- Soft blob -->
+      <symbol id="shape-blob" viewBox="0 0 100 100">
+        <path d="M50 12 C76 12 88 30 88 54 C88 76 72 88 50 88 C28 88 12 76 12 54 C12 30 24 12 50 12 Z" stroke="currentColor" stroke-width="4"/>
+      </symbol>
+      <!-- Rounded square, rounder corners -->
+      <symbol id="shape-squircle" viewBox="0 0 100 100">
+        <rect x="14" y="14" width="72" height="72" rx="30" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/>
+      </symbol>
+      <!-- Rounded hexagon, pointed left and right -->
+      <symbol id="shape-hexagon" viewBox="0 0 100 100">
+        <polygon points="14,50 30,26 70,26 86,50 70,74 30,74" stroke="currentColor" stroke-width="22" stroke-linejoin="round"/>
+      </symbol>
+      <!-- Two stacked lobes (green): wide rounded lobes joined by a narrow waist -->
+      <symbol id="shape-double" viewBox="0 0 100 100">
+        <rect x="12" y="10" width="76" height="40" rx="20"/>
+        <rect x="12" y="50" width="76" height="40" rx="20"/>
+        <rect x="36" y="36" width="28" height="28"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -1168,8 +1289,8 @@
         </div>
       </div>
 
-      <!-- Right column: the script aligns Fictional Characters to the bottom of Videogames
-           and Cars to the bottom of Movies (wide screens only) -->
+      <!-- Right column (wide screens): the script aligns Fictional Characters to the bottom of Videogames,
+           the Cars + Gaming brands row to the bottom of Movies and Colors to the bottom of TV Shows -->
       <div class="col col-right">
         <div class="fav-card">
           <h3>Artists</h3>
@@ -1280,14 +1401,66 @@
             <li><a href="https://scottpilgrim.fandom.com/wiki/Ramona_Flowers" target="_blank" rel="noopener">Ramona Flowers</a></li>
           </ul>
         </div>
-        <div class="fav-card">
-          <h3>Cars</h3>
-          <ul>
-            <li><a href="https://en.wikipedia.org/wiki/Nissan_180SX" target="_blank" rel="noopener">Nissan 180SX</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Nissan_GT-R" target="_blank" rel="noopener">Nissan R35</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Lexus_LS" target="_blank" rel="noopener">Lexus LS400</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Lamborghini_Aventador" target="_blank" rel="noopener">Lamborghini Aventador SVJ</a></li>
-          </ul>
+
+        <!-- Cars (left) and Gaming brands (right): two separate boxes side by side in one row -->
+        <div class="cars-brands">
+          <div class="fav-card">
+            <h3>Cars</h3>
+            <ul>
+              <li><a href="https://en.wikipedia.org/wiki/Nissan_180SX" target="_blank" rel="noopener">Nissan 180SX</a></li>
+              <li><a href="https://en.wikipedia.org/wiki/Nissan_GT-R" target="_blank" rel="noopener">Nissan R35</a></li>
+              <li><a href="https://en.wikipedia.org/wiki/Lexus_LS" target="_blank" rel="noopener">Lexus LS400</a></li>
+              <li><a href="https://en.wikipedia.org/wiki/Lamborghini_Aventador" target="_blank" rel="noopener">Lamborghini Aventador SVJ</a></li>
+            </ul>
+          </div>
+          <div class="fav-card">
+            <h3>Gaming brands</h3>
+            <ul>
+              <li><a href="https://www.valvesoftware.com" target="_blank" rel="noopener">Valve</a></li>
+              <li><a href="https://www.nintendo.com" target="_blank" rel="noopener">Nintendo</a></li>
+              <li><a href="https://www.rockstargames.com" target="_blank" rel="noopener">Rockstar Games</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Colors: eight colors sorted from dark to light, each with its own Material shape.
+             --c is the color. -->
+        <div class="fav-card colors-card">
+          <h3>Colors</h3>
+          <div class="swatches">
+            <div class="swatch">
+              <svg class="swatch-shape" viewBox="0 0 100 100" style="--c: #100020" aria-hidden="true"><use href="#shape-triangle"/></svg>
+              <span class="hex">#100020</span>
+            </div>
+            <div class="swatch">
+              <svg class="swatch-shape" viewBox="0 0 100 100" style="--c: #360087" aria-hidden="true"><use href="#shape-diamond"/></svg>
+              <span class="hex">#360087</span>
+            </div>
+            <div class="swatch">
+              <svg class="swatch-shape" viewBox="0 0 100 100" style="--c: #8c0007" aria-hidden="true"><use href="#shape-heart"/></svg>
+              <span class="hex">#8C0007</span>
+            </div>
+            <div class="swatch">
+              <svg class="swatch-shape" viewBox="0 0 100 100" style="--c: #7617FF" aria-hidden="true"><use href="#shape-arch"/></svg>
+              <span class="hex">#7617FF</span>
+            </div>
+            <div class="swatch">
+              <svg class="swatch-shape" viewBox="0 0 100 100" style="--c: #fb8cac" aria-hidden="true"><use href="#shape-blob"/></svg>
+              <span class="hex">#FB8CAC</span>
+            </div>
+            <div class="swatch">
+              <svg class="swatch-shape" viewBox="0 0 100 100" style="--c: #fda8bf" aria-hidden="true"><use href="#shape-squircle"/></svg>
+              <span class="hex">#FDA8BF</span>
+            </div>
+            <div class="swatch">
+              <svg class="swatch-shape" viewBox="0 0 100 100" style="--c: #ffd60a" aria-hidden="true"><use href="#shape-hexagon"/></svg>
+              <span class="hex">#FFD60A</span>
+            </div>
+            <div class="swatch">
+              <svg class="swatch-shape" viewBox="0 0 100 100" style="--c: #7aff05" aria-hidden="true"><use href="#shape-double"/></svg>
+              <span class="hex">#7AFF05</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1351,33 +1524,23 @@
     <div class="mod-layout">
       <h3 class="sub mod-label">Emulators</h3>
 
-      <!-- Column 1: Nintendo -->
+      <!-- Column 1: Nintendo, in release order (NES first, Switch 2 last) -->
       <div class="mod-group">
         <h3 class="sub mod-sub">Nintendo</h3>
         <div class="fav-grid">
           <div class="fav-card">
-            <h3><a href="https://dolphin-emu.org" target="_blank" rel="noopener">Dolphin</a></h3>
-            <p>Emulator for GameCube and Wii games.</p>
-            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+            <h3><a href="https://www.mesen.ca" target="_blank" rel="noopener">Mesen</a></h3>
+            <p>Accurate emulator for NES and SNES games.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS</p>
           </div>
           <div class="fav-card">
-            <h3><a href="https://suyu.dev/" target="_blank" rel="noopener">Suyu</a></h3>
-            <p>Emulator for Nintendo Switch games, continuing the yuzu project.</p>
-            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+            <h3><a href="https://www.snes9x.com" target="_blank" rel="noopener">snes9x</a></h3>
+            <p>Emulator for Super Nintendo games, known for good speed and compatibility.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS</p>
           </div>
           <div class="fav-card">
-            <h3><a href="https://citra-emu.org" target="_blank" rel="noopener">Citra</a></h3>
-            <p>Emulator for Nintendo 3DS games. Development has stopped.</p>
-            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
-          </div>
-          <div class="fav-card">
-            <h3><a href="https://cemu.info" target="_blank" rel="noopener">Cemu</a></h3>
-            <p>Emulator for Wii U games.</p>
-            <p class="platforms">Platforms: Windows, Linux</p>
-          </div>
-          <div class="fav-card">
-            <h3><a href="https://ares-emu.net" target="_blank" rel="noopener">ares</a></h3>
-            <p>Multi-system emulator for NES, SNES, Nintendo 64, Game Boy and Game Boy Advance.</p>
+            <h3><a href="https://github.com/simple64/simple64" target="_blank" rel="noopener">simple64</a></h3>
+            <p>Easy-to-use emulator for Nintendo 64 games, based on mupen64plus.</p>
             <p class="platforms">Platforms: Windows, Linux, macOS</p>
           </div>
           <div class="fav-card">
@@ -1390,10 +1553,35 @@
             <p>Emulator for Nintendo DS games, with good compatibility and speed.</p>
             <p class="platforms">Platforms: Windows, Linux, macOS</p>
           </div>
+          <div class="fav-card">
+            <h3><a href="https://dolphin-emu.org" target="_blank" rel="noopener">Dolphin</a></h3>
+            <p>Emulator for GameCube and Wii games.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://azahar-emu.org" target="_blank" rel="noopener">Azahar</a></h3>
+            <p>Emulator for Nintendo 3DS games, based on the discontinued Citra.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://cemu.info" target="_blank" rel="noopener">Cemu</a></h3>
+            <p>Emulator for Wii U games. The Android version is still experimental.</p>
+            <p class="platforms">Platforms: Windows, Linux, Android (experimental)</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://suyu.dev/" target="_blank" rel="noopener">Suyu</a></h3>
+            <p>Emulator for Nintendo Switch games, continuing the yuzu project.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS, Android</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://github.com/Djihads80/Eglantine" target="_blank" rel="noopener">Eglantine</a></h3>
+            <p>Emulator for Nintendo Switch 2 games, based on Eden.</p>
+            <p class="platforms">Platforms: Windows, Linux, macOS</p>
+          </div>
         </div>
       </div>
 
-      <!-- Column 2: PlayStation -->
+      <!-- Column 2: PlayStation, in release order -->
       <div class="mod-group">
         <h3 class="sub mod-sub">PlayStation</h3>
         <div class="fav-grid">
@@ -1411,6 +1599,16 @@
             <h3><a href="https://rpcs3.net" target="_blank" rel="noopener">RPCS3</a></h3>
             <p>Emulator for PlayStation 3 games. Compatibility varies a lot from game to game.</p>
             <p class="platforms">Platforms: Windows, Linux, macOS</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://github.com/shadps4-emu/shadPS4" target="_blank" rel="noopener">shadPS4</a></h3>
+            <p>Emulator for PlayStation 4 games, still in early development.</p>
+            <p class="platforms">Platforms: Windows, Linux</p>
+          </div>
+          <div class="fav-card">
+            <h3><a href="https://alternativeto.net/software/kytyps5/about/" target="_blank" rel="noopener">KytyPS5</a></h3>
+            <p>Early PlayStation 5 emulator, based on Kyty. Can also run some PS4 games.</p>
+            <p class="platforms">Platforms: Windows</p>
           </div>
           <div class="fav-card">
             <h3><a href="https://www.ppsspp.org" target="_blank" rel="noopener">PPSSPP</a></h3>
@@ -1466,7 +1664,7 @@
           <h3 class="sub mod-sub">PC Ports</h3>
           <div class="fav-grid">
             <div class="fav-card">
-              <h3><a href="#" target="_blank" rel="noopener">Recomp Launcher</a></h3>
+              <h3><a href="https://recomplauncher.com/" target="_blank" rel="noopener">Recomp Launcher</a></h3>
               <p>Launcher for N64 PC ports made by recompiling the original games. You need your own ROM.</p>
               <p class="platforms">Platforms: Windows, Linux, macOS</p>
             </div>
@@ -1714,8 +1912,9 @@
     }
 
     // ---------- Right column alignment (wide screens) ----------
-    // Fictional Characters ends at the bottom of Videogames, and Cars ends at the bottom of Movies.
-    // The script measures the left cards and sets the three row heights of the right column.
+    // Fictional Characters ends at the bottom of Videogames, the Cars + Gaming brands row ends
+    // at the bottom of Movies, and Colors ends at the bottom of TV Shows.
+    // The script measures the left cards and sets the four row heights of the right column.
     // A card never gets shorter than its content, so no text is cut off.
     const rightCol = document.querySelector('.col-right');
     const leftCards = [...favLeftCol.children]; // Videogames, Movies, TV Shows
@@ -1726,21 +1925,24 @@
         return;
       }
 
-      rightCol.style.gridTemplateRows = 'auto auto auto'; // measure the natural height of each card first
+      rightCol.style.gridTemplateRows = 'auto auto auto auto'; // measure the natural height of each card first
       const gap = parseFloat(getComputedStyle(rightCol).rowGap) || 0;
       const videogamesH = leftCards[0].offsetHeight;
       const moviesH = leftCards[1].offsetHeight;
-      const [artists, fictional, cars] = [...rightCol.children];
+      const tvH = leftCards[2].offsetHeight;
+      const [artists, fictional, carsBrands, colors] = [...rightCol.children];
 
       const artistsH = artists.offsetHeight;
       const fictionalNatural = fictional.offsetHeight;
-      const carsNatural = cars.offsetHeight;
+      const carsBrandsNatural = carsBrands.offsetHeight;
+      const colorsNatural = colors.offsetHeight;
 
       // Target heights; if a card's content is taller, the card keeps its content height
       const fictionalH = Math.max(videogamesH - artistsH - gap, fictionalNatural);
-      const carsH = Math.max(moviesH, carsNatural);
+      const carsBrandsH = Math.max(moviesH, carsBrandsNatural);
+      const colorsH = Math.max(tvH, colorsNatural);
 
-      rightCol.style.gridTemplateRows = `${artistsH}px ${fictionalH}px ${carsH}px`;
+      rightCol.style.gridTemplateRows = `${artistsH}px ${fictionalH}px ${carsBrandsH}px ${colorsH}px`;
     }
 
     function layoutFavorites() {
