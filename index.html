@@ -433,14 +433,21 @@
       opacity: 0.85;
     }
 
-    /* Social pills: uniform, centered rows, each with its platform icon */
+    /* Social pills: two clean rows, centered, each with its platform icon */
     .socials {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      max-width: 760px;
+    }
+
+    .social-row {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 8px;
-      margin-top: 24px;
-      max-width: 720px;
     }
 
     .socials a {
@@ -519,8 +526,8 @@
     }
 
     /* Two-column favorites layout.
-       Narrow screens: one column (Videogames, Movies, TV Shows, then Artists, Fictional Characters, Cars, Gaming brands, Colors).
-       Wide screens: left column = picture grids (flexible), right column = Artists, Fictional Characters, Cars + Gaming brands side by side, Colors (fixed 420px). */
+       Narrow screens: one column (Videogames, Movies, TV Shows, then Artists, Fictional Characters, Cars, Gaming Brands, Colors).
+       Wide screens: left column = picture grids (flexible), right column = Artists, Fictional Characters, Cars + Gaming Brands side by side, Colors (fixed 420px). */
     .fav-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -549,9 +556,9 @@
     }
 
     /* Right column on wide screens: a grid with four rows
-       (Artists, Fictional Characters, Cars + Gaming brands, Colors).
+       (Artists, Fictional Characters, Cars + Gaming Brands, Colors).
        The script sets the row heights, so Fictional Characters ends at the bottom of Videogames,
-       the Cars + Gaming brands row ends at the bottom of Movies and Colors ends at the bottom of TV Shows. */
+       the Cars + Gaming Brands row ends at the bottom of Movies and Colors ends at the bottom of TV Shows. */
     @media (min-width: 1100px) {
       .col-right {
         display: grid;
@@ -623,8 +630,8 @@
       opacity: 0.6;
     }
 
-    /* ---------- Cars and Gaming brands (side by side) ----------
-       Two separate boxes in one row: Cars on the left, Gaming brands on the right.
+    /* ---------- Cars and Gaming Brands (side by side) ----------
+       Two separate boxes in one row: Cars on the left, Gaming Brands on the right.
        Both boxes share the row height, so the column width does not change. */
     .cars-brands {
       display: grid;
@@ -1245,22 +1252,24 @@
       <p class="pronouns">any pronouns</p>
       <p class="bio">Hi, im Steiny. A german thing.<br>I like video games, music, indie series, movies, fandoms, anime, cars, modding, linux, Nothing (R) and tech stuff.</p>
 
-      <!-- Order: social, videos and streams, music, code, then gaming and mods.
-           Icons: Simple Icons (single-color logos) from the jsDelivr CDN, except Planet Minecraft
+      <!-- Two rows. Icons: Simple Icons (single-color logos) from the jsDelivr CDN, except Planet Minecraft
            and SteamGridDB, which use simple outline icons drawn here. -->
       <div class="socials">
-        <a href="https://www.instagram.com/steiny_666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/instagram.svg')"></span>Instagram</a>
-        <a href="https://www.tiktok.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/tiktok.svg')"></span>TikTok</a>
-        <a href="https://www.youtube.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/youtube.svg')"></span>YouTube</a>
-        <a href="https://twitch.tv/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/twitch.svg')"></span>Twitch</a>
-        <a href="https://de.pinterest.com/Steiny_666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/pinterest.svg')"></span>Pinterest</a>
-        <a href="https://soundcloud.com/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/soundcloud.svg')"></span>SoundCloud</a>
-        <a href="https://www.last.fm/user/Steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/lastdotfm.svg')"></span>Last.fm</a>
-        <a href="https://github.com/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/github.svg')"></span>GitHub</a>
-        <a href="https://steamcommunity.com/id/steiny666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/steam.svg')"></span>Steam</a>
-        <a href="https://www.steamgriddb.com/profile/76561199380229448" target="_blank" rel="noopener"><svg class="ico-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>SteamGridDB</a>
-        <a href="https://gamebanana.com/members/4800550" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/gamebanana.svg')"></span>GameBanana</a>
-        <a href="https://www.planetminecraft.com/member/steiny666/" target="_blank" rel="noopener"><svg class="ico-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>Planet Minecraft</a>
+        <div class="social-row">
+          <a href="https://www.tiktok.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/tiktok.svg')"></span>TikTok</a>
+          <a href="https://www.youtube.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/youtube.svg')"></span>YouTube</a>
+          <a href="https://twitch.tv/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/twitch.svg')"></span>Twitch</a>
+          <a href="https://de.pinterest.com/Steiny_666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/pinterest.svg')"></span>Pinterest</a>
+          <a href="https://soundcloud.com/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/soundcloud.svg')"></span>SoundCloud</a>
+          <a href="https://www.last.fm/user/Steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/lastdotfm.svg')"></span>Last.fm</a>
+        </div>
+        <div class="social-row">
+          <a href="https://github.com/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/github.svg')"></span>GitHub</a>
+          <a href="https://steamcommunity.com/id/steiny666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/steam.svg')"></span>Steam</a>
+          <a href="https://www.steamgriddb.com/profile/76561199380229448" target="_blank" rel="noopener"><svg class="ico-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>SteamGridDB</a>
+          <a href="https://gamebanana.com/members/4800550" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/gamebanana.svg')"></span>GameBanana</a>
+          <a href="https://www.planetminecraft.com/member/steiny666/" target="_blank" rel="noopener"><svg class="ico-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>Planet Minecraft</a>
+        </div>
       </div>
     </div>
   </section>
@@ -1290,7 +1299,7 @@
       </div>
 
       <!-- Right column (wide screens): the script aligns Fictional Characters to the bottom of Videogames,
-           the Cars + Gaming brands row to the bottom of Movies and Colors to the bottom of TV Shows -->
+           the Cars + Gaming Brands row to the bottom of Movies and Colors to the bottom of TV Shows -->
       <div class="col col-right">
         <div class="fav-card">
           <h3>Artists</h3>
@@ -1402,7 +1411,7 @@
           </ul>
         </div>
 
-        <!-- Cars (left) and Gaming brands (right): two separate boxes side by side in one row -->
+        <!-- Cars (left) and Gaming Brands (right): two separate boxes side by side in one row -->
         <div class="cars-brands">
           <div class="fav-card">
             <h3>Cars</h3>
@@ -1414,7 +1423,7 @@
             </ul>
           </div>
           <div class="fav-card">
-            <h3>Gaming brands</h3>
+            <h3>Gaming Brands</h3>
             <ul>
               <li><a href="https://www.valvesoftware.com" target="_blank" rel="noopener">Valve</a></li>
               <li><a href="https://www.nintendo.com" target="_blank" rel="noopener">Nintendo</a></li>
@@ -1681,8 +1690,8 @@
             </div>
             <div class="fav-card">
               <h3><a href="https://www.ctgpdx.com/" target="_blank" rel="noopener">CTGP Deluxe</a></h3>
-              <p>Mod for Mario Kart Wii with many extra custom tracks and online play.</p>
-              <p class="platforms">Platform: Wii / Dolphin</p>
+              <p>Mod for Mario Kart 8 Deluxe with many extra custom tracks.</p>
+              <p class="platforms">Platform: Nintendo Switch</p>
             </div>
           </div>
         </div>
@@ -1750,7 +1759,7 @@
         "images/games/01.png", // Red Dead Redemption 2 — Rockstar Games
         "images/games/07.png", // Grand Theft Auto V — Rockstar Games
         "images/games/52.png", // Grand Theft Auto VI — Rockstar Games
-        // Rockstar Games
+        // CD Projekt RED
         "images/games/02.png", // Cyberpunk 2077 — CD Projekt RED
         // Valve
         "images/games/46.png", // Portal — Valve
@@ -1839,6 +1848,7 @@
         "images/tv/15.png",  // Death Note
         "images/tv/13.png",  // Sakamoto Days
         "images/tv/14.png",  // Chainsmoker Cat
+        "images/tv/19.png",  // Cyberpunk: Edgerunners
         // Other
         "images/tv/19.png",  // Backrooms
       ],
@@ -1924,7 +1934,7 @@
     }
 
     // ---------- Right column alignment (wide screens) ----------
-    // Fictional Characters ends at the bottom of Videogames, the Cars + Gaming brands row ends
+    // Fictional Characters ends at the bottom of Videogames, the Cars + Gaming Brands row ends
     // at the bottom of Movies, and Colors ends at the bottom of TV Shows.
     // The script measures the left cards and sets the four row heights of the right column.
     // A card never gets shorter than its content, so no text is cut off.
