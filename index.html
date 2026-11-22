@@ -164,24 +164,47 @@
       max-width: 100%;
       text-wrap: balance;
       overflow-wrap: break-word;
-      animation: spawn 1.2s ease-out both;
+      animation: heroIn 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
     }
 
-    /* Thin line between the English and the Japanese title */
+    /* Thin line between the English and the Japanese title.
+       It grows out from the middle, so it looks like it is drawn. */
     .hero .divider {
       display: block;
       width: 56px;
       height: 1px;
       background: rgba(255, 255, 255, 0.6);
-      animation: spawn 1.2s ease-out 0.15s both;
+      transform-origin: center;
+      animation: heroLine 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.45s both;
     }
 
-    @keyframes spawn {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
+    /* Entrance for the title and the Japanese line: a soft rise, out of a light blur */
+    @keyframes heroIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+        filter: blur(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
     }
 
-    /* Japanese line: light, widely spaced, fades in a little after the English title */
+    /* Entrance for the divider line: grows from the middle to full width */
+    @keyframes heroLine {
+      from {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
+
+    /* Japanese line: light, widely spaced, arrives a little after the English title */
     .jp {
       font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
       font-weight: 300;
@@ -189,7 +212,7 @@
       letter-spacing: 0.3em;
       text-indent: 0.3em; /* balances the trailing letter-spacing so the line is truly centered */
       opacity: 0.8;
-      animation: spawn 1.2s ease-out 0.3s both;
+      animation: heroIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.7s both;
     }
 
     /* Small screens: smaller title so it never overflows */
@@ -202,6 +225,15 @@
         font-size: 0.85rem;
         letter-spacing: 0.2em;
         text-indent: 0.2em;
+      }
+    }
+
+    /* Reduced motion: the hero simply appears, without movement or blur */
+    @media (prefers-reduced-motion: reduce) {
+      .hero h1,
+      .hero .divider,
+      .jp {
+        animation: none;
       }
     }
 
@@ -644,7 +676,7 @@
 
     /* ---------- Enlarged view (click on a cover or the setup picture) ----------
        The whole page behind it is blurred. The picture grows from its place to the middle of the screen.
-       Once it is enlarged, it tilts in 3D toward the mouse. */
+       Covers tilt in 3D toward the mouse once enlarged. The setup picture does not tilt. */
     .lightbox {
       position: fixed;
       inset: 0;
@@ -688,11 +720,11 @@
       transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    /* Landscape picture (setup): wider card in 16:9 */
+    /* Landscape picture (setup): large 16:9 card, as big as the screen allows */
     .lb-card.wide {
       height: auto;
-      width: min(80vw, 1100px);
-      max-width: 90vw;
+      width: min(94vw, calc(94vh * 16 / 9));
+      max-width: none;
       aspect-ratio: 16 / 9;
     }
 
@@ -1481,7 +1513,7 @@
     <p class="ai-note">AI was used for this website</p>
   </footer>
 
-  <!-- Enlarged view: opens when a cover or the setup picture is clicked. The picture tilts in 3D with the mouse.
+  <!-- Enlarged view: opens when a cover or the setup picture is clicked. Covers tilt in 3D with the mouse.
        Click the blurred background or press Esc to close. -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <div class="lb-stage" id="lb-stage">
@@ -1726,7 +1758,7 @@
 
     // ---------- Enlarged view ----------
     // The picture grows from its place on the page to the middle of the screen while the page behind it blurs.
-    // Once it is enlarged, it tilts in 3D toward the mouse.
+    // Covers tilt in 3D toward the mouse once enlarged. The setup picture stays flat.
     const lightbox = document.getElementById('lightbox');
     const lbStage = document.getElementById('lb-stage');
     const lbCard = document.getElementById('lb-card');
@@ -1740,6 +1772,10 @@
       lbCard.style.backgroundImage = hasImage ? background : '';
       lbCard.classList.toggle('empty', !hasImage);
       lbCard.classList.toggle('wide', Boolean(wide));
+
+      // No tilt carried over from an earlier picture
+      lbStage.style.setProperty('--lrx', '0deg');
+      lbStage.style.setProperty('--lry', '0deg');
 
       // Start the animation at the source's position and size, then grow to the center
       const r = source.getBoundingClientRect();
@@ -1772,9 +1808,11 @@
       if (e.target === lightbox) closeLightbox(); // click the blurred background to close
     });
 
-    // 3D tilt of the enlarged picture: follows the mouse, back to flat when the mouse leaves
+    // 3D tilt of an enlarged cover: follows the mouse, back to flat when the mouse leaves.
+    // The setup picture (wide) never tilts.
     lightbox.addEventListener('pointermove', (e) => {
       if (!lightbox.classList.contains('open')) return;
+      if (lbCard.classList.contains('wide')) return;
       const r = lbCard.getBoundingClientRect();
       const x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);  // -1 (left) to 1 (right)
       const y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2); // -1 (top) to 1 (bottom)
