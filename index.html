@@ -998,7 +998,7 @@
 
       #modding h2 {
         font-size: clamp(2.4rem, 6vh, 4rem);
-        margin-bottom: 16px;
+        margin-bottom: 12px;
       }
 
       .mod-layout {
@@ -1011,13 +1011,15 @@
         text-align: left;
       }
 
-      /* "Emulators" heading spans the first three columns in the first row, centered over them */
+      /* "Emulators" heading spans the first three columns in the first row, centered over them.
+         Large, but sized by the screen height so the whole section still fits. */
       .mod-layout > .mod-label {
         grid-column: 1 / 4;
         grid-row: 1;
         margin: 0 0 4px;
-        font-size: 1.1rem;
+        font-size: clamp(1.4rem, 3vh, 2rem);
         font-weight: 700;
+        line-height: 1.2;
         text-align: center;
       }
 
@@ -1245,14 +1247,12 @@
 
       <!-- Order: social, videos and streams, music, code, then gaming and mods.
            Icons: Simple Icons (single-color logos) from the jsDelivr CDN, except Planet Minecraft
-           and SteamGridDB, which use simple outline icons drawn here.
-           Discord still needs its link (href="#" for now). -->
+           and SteamGridDB, which use simple outline icons drawn here. -->
       <div class="socials">
         <a href="https://www.instagram.com/steiny_666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/instagram.svg')"></span>Instagram</a>
         <a href="https://www.tiktok.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/tiktok.svg')"></span>TikTok</a>
         <a href="https://www.youtube.com/@steiny_666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/youtube.svg')"></span>YouTube</a>
         <a href="https://twitch.tv/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/twitch.svg')"></span>Twitch</a>
-        <a href="#" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/discord.svg')"></span>Discord</a>
         <a href="https://de.pinterest.com/Steiny_666/" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/pinterest.svg')"></span>Pinterest</a>
         <a href="https://soundcloud.com/steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/soundcloud.svg')"></span>SoundCloud</a>
         <a href="https://www.last.fm/user/Steiny666" target="_blank" rel="noopener"><span class="ico" style="--src: url('https://cdn.jsdelivr.net/npm/simple-icons@13/icons/lastdotfm.svg')"></span>Last.fm</a>
@@ -1665,8 +1665,8 @@
           <div class="fav-grid">
             <div class="fav-card">
               <h3><a href="https://recomplauncher.com/" target="_blank" rel="noopener">Recomp Launcher</a></h3>
-              <p>Launcher for N64 PC ports made by recompiling the original games. You need your own ROM.</p>
-              <p class="platforms">Platforms: Windows, Linux, macOS</p>
+              <p>Website that catalogs fan-made recompiled PC ports of console games, such as N64 and GameCube titles. A dedicated launcher is still planned. You need your own legal copy of each game.</p>
+              <p class="platforms">Platforms: Windows, Linux, macOS (depends on the project)</p>
             </div>
           </div>
         </div>
