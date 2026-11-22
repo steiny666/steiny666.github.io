@@ -343,7 +343,7 @@
       display: block;
     }
 
-    /* The colored shape turns slowly; pictures and figures on top stay still */
+    /* The shape turns slowly around the picture. The picture itself stays still. */
     .spin {
       transform-box: view-box;
       transform-origin: 100px 100px;
@@ -642,8 +642,8 @@
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
     }
 
-    /* ---------- Enlarged view (click on a cover) ----------
-       The whole page behind it is blurred. The cover grows from its tile to the middle of the screen.
+    /* ---------- Enlarged view (click on a cover or the setup picture) ----------
+       The whole page behind it is blurred. The picture grows from its place to the middle of the screen.
        Once it is enlarged, it tilts in 3D toward the mouse. */
     .lightbox {
       position: fixed;
@@ -686,6 +686,14 @@
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
       transform: scale(0.96);
       transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Landscape picture (setup): wider card in 16:9 */
+    .lb-card.wide {
+      height: auto;
+      width: min(80vw, 1100px);
+      max-width: 90vw;
+      aspect-ratio: 16 / 9;
     }
 
     .lb-card.empty {
@@ -794,6 +802,7 @@
       background-position: center;
       border: 1px dashed rgba(255, 255, 255, 0.3);
       overflow: hidden;
+      cursor: zoom-in;
       transition: transform 0.3s ease;
     }
 
@@ -805,6 +814,11 @@
     }
 
     .setup-spot:hover { transform: scale(1.02); }
+
+    .setup-spot:focus-visible {
+      outline: 2px solid rgba(208, 188, 255, 0.8);
+      outline-offset: 4px;
+    }
 
     /* Right column: compact PC Specs, OS Info and Equipment cards, grouped together */
     .setup-info {
@@ -1050,32 +1064,26 @@
       <div class="avatar grow">
         <svg viewBox="0 0 200 200" aria-hidden="true">
           <defs>
-            <!-- Picture area: Filow's flower shape, scaled to 86% so the picture sits inside the ring -->
-            <clipPath id="avatar-clip">
-              <circle cx="100" cy="100" r="43"/>
-              <circle cx="143" cy="100" r="41.3"/>
-              <circle cx="121.5" cy="137.2" r="41.3"/>
-              <circle cx="78.5" cy="137.2" r="41.3"/>
-              <circle cx="57" cy="100" r="41.3"/>
-              <circle cx="78.5" cy="62.8" r="41.3"/>
-              <circle cx="121.5" cy="62.8" r="41.3"/>
-            </clipPath>
+            <!-- Mask in Filow's flower shape. It turns slowly; the picture under it stays still. -->
+            <mask id="avatar-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+              <g class="spin" fill="#fff">
+                <circle cx="100" cy="100" r="50"/>
+                <circle cx="150" cy="100" r="48"/>
+                <circle cx="125" cy="143.3" r="48"/>
+                <circle cx="75" cy="143.3" r="48"/>
+                <circle cx="50" cy="100" r="48"/>
+                <circle cx="75" cy="56.7" r="48"/>
+                <circle cx="125" cy="56.7" r="48"/>
+              </g>
+            </mask>
           </defs>
-          <!-- Colored ring: Filow's flower shape, turning slowly behind the picture -->
-          <g class="spin" fill="#d0bcff">
-            <circle cx="100" cy="100" r="50"/>
-            <circle cx="150" cy="100" r="48"/>
-            <circle cx="125" cy="143.3" r="48"/>
-            <circle cx="75" cy="143.3" r="48"/>
-            <circle cx="50" cy="100" r="48"/>
-            <circle cx="75" cy="56.7" r="48"/>
-            <circle cx="125" cy="56.7" r="48"/>
+          <g mask="url(#avatar-mask)">
+            <!-- Placeholder figure, hidden behind the picture once images/pfp.png exists -->
+            <circle cx="100" cy="88" r="22" fill="#381e72"/>
+            <path d="M55 150 C55 118 145 118 145 150 Z" fill="#381e72"/>
+            <!-- Your profile picture: put it at images/pfp.png. It does not turn. -->
+            <image href="images/pfp.png" width="200" height="200" preserveAspectRatio="xMidYMid slice"/>
           </g>
-          <!-- Placeholder figure, hidden behind the picture once images/pfp.png exists -->
-          <circle cx="100" cy="88" r="22" fill="#381e72"/>
-          <path d="M55 150 C55 118 145 118 145 150 Z" fill="#381e72"/>
-          <!-- Your profile picture: put it at images/pfp.png. It stays still inside the inner shape -->
-          <image href="images/pfp.png" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatar-clip)"/>
         </svg>
       </div>
       <h3>Steiny</h3>
@@ -1134,74 +1142,77 @@
         <div class="fav-card">
           <h3>Artists</h3>
           <div class="artist-row">
+            <!-- Rap / hip-hop first -->
             <div class="artist">
               <div class="artist-pic grow">
                 <svg viewBox="0 0 200 200" aria-hidden="true">
                   <defs>
-                    <!-- Wavy cookie shape: a center circle plus 10 soft bumps -->
-                    <clipPath id="artist-clip-1">
-                      <circle cx="100" cy="100" r="62"/>
-                      <circle cx="162" cy="100" r="28"/>
-                      <circle cx="150.2" cy="136.4" r="28"/>
-                      <circle cx="119.2" cy="158.9" r="28"/>
-                      <circle cx="80.8" cy="158.9" r="28"/>
-                      <circle cx="49.8" cy="136.4" r="28"/>
-                      <circle cx="38" cy="100" r="28"/>
-                      <circle cx="49.8" cy="63.6" r="28"/>
-                      <circle cx="80.8" cy="41.1" r="28"/>
-                      <circle cx="119.2" cy="41.1" r="28"/>
-                      <circle cx="150.2" cy="63.6" r="28"/>
-                    </clipPath>
+                    <!-- Flower-shaped mask: the shape turns, the picture stays still -->
+                    <mask id="artist-mask-3" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+                      <g class="spin" fill="#fff">
+                        <circle cx="100" cy="100" r="50"/>
+                        <circle cx="150" cy="100" r="48"/>
+                        <circle cx="125" cy="143.3" r="48"/>
+                        <circle cx="75" cy="143.3" r="48"/>
+                        <circle cx="50" cy="100" r="48"/>
+                        <circle cx="75" cy="56.7" r="48"/>
+                        <circle cx="125" cy="56.7" r="48"/>
+                      </g>
+                    </mask>
                   </defs>
-                  <!-- Spinning colored shape -->
-                  <g class="spin">
-                    <rect width="200" height="200" fill="#ffd6e7" clip-path="url(#artist-clip-1)"/>
+                  <g mask="url(#artist-mask-3)">
+                    <image href="images/artists/filow.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice"/>
                   </g>
-                  <!-- Picture stays still; put the picture path or URL in href -->
-                  <image href="images/artists/joost-klein.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-1)"/>
+                </svg>
+              </div>
+              <p class="artist-name">Filow</p>
+            </div>
+            <div class="artist">
+              <div class="artist-pic grow">
+                <svg viewBox="0 0 200 200" aria-hidden="true">
+                  <defs>
+                    <!-- Wavy cookie-shaped mask: the shape turns, the picture stays still -->
+                    <mask id="artist-mask-1" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+                      <g class="spin" fill="#fff">
+                        <circle cx="100" cy="100" r="62"/>
+                        <circle cx="162" cy="100" r="28"/>
+                        <circle cx="150.2" cy="136.4" r="28"/>
+                        <circle cx="119.2" cy="158.9" r="28"/>
+                        <circle cx="80.8" cy="158.9" r="28"/>
+                        <circle cx="49.8" cy="136.4" r="28"/>
+                        <circle cx="38" cy="100" r="28"/>
+                        <circle cx="49.8" cy="63.6" r="28"/>
+                        <circle cx="80.8" cy="41.1" r="28"/>
+                        <circle cx="119.2" cy="41.1" r="28"/>
+                        <circle cx="150.2" cy="63.6" r="28"/>
+                      </g>
+                    </mask>
+                  </defs>
+                  <g mask="url(#artist-mask-1)">
+                    <image href="images/artists/joost-klein.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice"/>
+                  </g>
                 </svg>
               </div>
               <p class="artist-name">Joost Klein</p>
             </div>
+            <!-- Electronic last -->
             <div class="artist">
               <div class="artist-pic grow">
                 <svg viewBox="0 0 200 200" aria-hidden="true">
                   <defs>
-                    <!-- Lumpy blob with five soft lobes, like the reference picture; scaled up 10% around the center -->
-                    <clipPath id="artist-clip-2">
-                      <path transform="translate(100 100) scale(1.1) translate(-100 -100)" d="M100 12 C74 12 82.2 31.3 61.2 46.6 C40.2 61.9 24.3 48.1 16.3 72.8 C8.3 97.5 29.2 95.7 37.2 120.4 C45.2 145.1 27.3 155.9 48.3 171.2 C69.3 186.5 74 166 100 166 C126 166 130.7 186.5 151.7 171.2 C172.7 155.9 154.8 145.1 162.8 120.4 C170.8 95.7 191.7 97.5 183.7 72.8 C175.7 48.1 159.8 61.9 138.8 46.6 C117.8 31.3 126 12 100 12 Z"/>
-                    </clipPath>
+                    <!-- Lumpy blob mask, scaled up 10% around the center. The shape turns, the picture stays still -->
+                    <mask id="artist-mask-2" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+                      <g class="spin" fill="#fff">
+                        <path transform="translate(100 100) scale(1.1) translate(-100 -100)" d="M100 12 C74 12 82.2 31.3 61.2 46.6 C40.2 61.9 24.3 48.1 16.3 72.8 C8.3 97.5 29.2 95.7 37.2 120.4 C45.2 145.1 27.3 155.9 48.3 171.2 C69.3 186.5 74 166 100 166 C126 166 130.7 186.5 151.7 171.2 C172.7 155.9 154.8 145.1 162.8 120.4 C170.8 95.7 191.7 97.5 183.7 72.8 C175.7 48.1 159.8 61.9 138.8 46.6 C117.8 31.3 126 12 100 12 Z"/>
+                      </g>
+                    </mask>
                   </defs>
-                  <g class="spin">
-                    <rect width="200" height="200" fill="#b9f0c4" clip-path="url(#artist-clip-2)"/>
+                  <g mask="url(#artist-mask-2)">
+                    <image href="images/artists/freddie-dredd.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice"/>
                   </g>
-                  <image href="images/artists/freddie-dredd.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-2)"/>
                 </svg>
               </div>
               <p class="artist-name">Freddie Dredd</p>
-            </div>
-            <div class="artist">
-              <div class="artist-pic grow">
-                <svg viewBox="0 0 200 200" aria-hidden="true">
-                  <defs>
-                    <!-- Flower shape: six overlapping circles plus a filled center (no hole) -->
-                    <clipPath id="artist-clip-3">
-                      <circle cx="100" cy="100" r="50"/>
-                      <circle cx="150" cy="100" r="48"/>
-                      <circle cx="125" cy="143.3" r="48"/>
-                      <circle cx="75" cy="143.3" r="48"/>
-                      <circle cx="50" cy="100" r="48"/>
-                      <circle cx="75" cy="56.7" r="48"/>
-                      <circle cx="125" cy="56.7" r="48"/>
-                    </clipPath>
-                  </defs>
-                  <g class="spin">
-                    <rect width="200" height="200" fill="#d0bcff" clip-path="url(#artist-clip-3)"/>
-                  </g>
-                  <image href="images/artists/filow.jpg" width="200" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#artist-clip-3)"/>
-                </svg>
-              </div>
-              <p class="artist-name">Filow</p>
             </div>
           </div>
         </div>
@@ -1258,8 +1269,8 @@
     <h2>Setup</h2>
 
     <div class="setup-layout">
-      <!-- Your setup picture: set SETUP_IMAGE at the top of the script -->
-      <div class="setup-spot" id="setup-spot"></div>
+      <!-- Your setup picture: set SETUP_IMAGE at the top of the script. Click it to enlarge. -->
+      <div class="setup-spot" id="setup-spot" role="button" tabindex="0" aria-label="Open enlarged setup picture"></div>
 
       <div class="setup-info">
         <div class="fav-card">
@@ -1470,7 +1481,7 @@
     <p class="ai-note">AI was used for this website</p>
   </footer>
 
-  <!-- Enlarged view: opens when a cover is clicked. The cover tilts in 3D with the mouse.
+  <!-- Enlarged view: opens when a cover or the setup picture is clicked. The picture tilts in 3D with the mouse.
        Click the blurred background or press Esc to close. -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <div class="lb-stage" id="lb-stage">
@@ -1710,24 +1721,28 @@
     document.fonts.ready.then(layoutFavorites); // fonts change the card heights once loaded
 
     // ---------- Setup picture ----------
-    document.getElementById('setup-spot').style.backgroundImage = `url("${SETUP_IMAGE}")`;
+    const setupSpot = document.getElementById('setup-spot');
+    setupSpot.style.backgroundImage = `url("${SETUP_IMAGE}")`;
 
     // ---------- Enlarged view ----------
-    // The cover grows from its tile to the middle of the screen while the page behind it blurs.
+    // The picture grows from its place on the page to the middle of the screen while the page behind it blurs.
     // Once it is enlarged, it tilts in 3D toward the mouse.
     const lightbox = document.getElementById('lightbox');
     const lbStage = document.getElementById('lb-stage');
     const lbCard = document.getElementById('lb-card');
-    let lastTile = null;
+    let lastSource = null;
 
-    function openLightbox(tile) {
-      const front = tile.querySelector('.front');
-      const hasImage = Boolean(front.style.backgroundImage);
-      lbCard.style.backgroundImage = hasImage ? front.style.backgroundImage : '';
+    // source: the element the picture grows from
+    // background: a CSS background-image value, e.g. url("images/a.png"), or '' for an empty placeholder
+    // wide: true for landscape pictures (setup), false for covers
+    function openLightbox(source, background, wide) {
+      const hasImage = Boolean(background);
+      lbCard.style.backgroundImage = hasImage ? background : '';
       lbCard.classList.toggle('empty', !hasImage);
+      lbCard.classList.toggle('wide', Boolean(wide));
 
-      // Start the animation at the tile's position and size, then grow to the center
-      const r = tile.getBoundingClientRect();
+      // Start the animation at the source's position and size, then grow to the center
+      const r = source.getBoundingClientRect();
       const cardWidth = lbCard.offsetWidth;
       const dx = r.left + r.width / 2 - window.innerWidth / 2;
       const dy = r.top + r.height / 2 - window.innerHeight / 2;
@@ -1741,7 +1756,7 @@
       lbCard.style.transition = '';
       lbCard.style.transform = '';
 
-      lastTile = tile;
+      lastSource = source;
     }
 
     function closeLightbox() {
@@ -1750,14 +1765,14 @@
       lightbox.setAttribute('aria-hidden', 'true');
       lbStage.style.setProperty('--lrx', '0deg'); // start flat next time
       lbStage.style.setProperty('--lry', '0deg');
-      if (lastTile) lastTile.focus({ preventScroll: true });
+      if (lastSource) lastSource.focus({ preventScroll: true });
     }
 
     lightbox.addEventListener('click', (e) => {
       if (e.target === lightbox) closeLightbox(); // click the blurred background to close
     });
 
-    // 3D tilt of the enlarged cover: follows the mouse, back to flat when the mouse leaves
+    // 3D tilt of the enlarged picture: follows the mouse, back to flat when the mouse leaves
     lightbox.addEventListener('pointermove', (e) => {
       if (!lightbox.classList.contains('open')) return;
       const r = lbCard.getBoundingClientRect();
@@ -1778,17 +1793,33 @@
       if (e.key === 'Escape') closeLightbox();
     });
 
+    // Setup picture: click or Enter/Space opens it enlarged
+    setupSpot.addEventListener('click', () => {
+      openLightbox(setupSpot, setupSpot.style.backgroundImage, true);
+    });
+
+    setupSpot.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLightbox(setupSpot, setupSpot.style.backgroundImage, true);
+      }
+    });
+
     // ---------- Cover tiles: click or Enter/Space opens the enlarged view ----------
     coverGrids.forEach((grid) => {
       grid.addEventListener('click', (e) => {
         const tile = e.target.closest('.tile');
-        if (tile) openLightbox(tile);
+        if (tile) {
+          const front = tile.querySelector('.front');
+          openLightbox(tile, front.style.backgroundImage, false);
+        }
       });
 
       grid.addEventListener('keydown', (e) => {
         if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('tile')) {
           e.preventDefault();
-          openLightbox(e.target);
+          const front = e.target.querySelector('.front');
+          openLightbox(e.target, front.style.backgroundImage, false);
         }
       });
     });
